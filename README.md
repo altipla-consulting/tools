@@ -14,6 +14,8 @@ curl https://tools.altipla.consulting/install/tools | bash
 
 El pack incluye las siguientes herramientas:
 
+- [ci](./cmd/ci)
+- [jnet](./cmd/jnet)
 - [reloader](./cmd/reloader)
 
 

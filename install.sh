@@ -5,8 +5,9 @@ set -eu
 mkdir -p ~/bin
 
 TOOLS=(
-  reloader
+  ci
   jnet
+  reloader
 )
 for app in "${TOOLS[@]}"
 do
