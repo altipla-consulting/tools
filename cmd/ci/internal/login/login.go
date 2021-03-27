@@ -35,7 +35,7 @@ func Start(ctx context.Context) error {
 
 	conf := &oauth2.Config{
 		ClientID:     "d7d38c193ed7aeebf5c2",
-		ClientSecret: "79bf46e5a72f2486ccc24bdca15c55a1902ac7dd",
+		ClientSecret: "b6e6b7939c67e4fdf9803563e1194b29e47b3c62",
 		Scopes:       []string{"repo"},
 		Endpoint:     oauth2github.Endpoint,
 	}
