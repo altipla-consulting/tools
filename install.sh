@@ -4,5 +4,17 @@ set -eu
 
 mkdir -p ~/bin
 
-curl https://tools.altipla.consulting/tools/reloader > ~/bin/reloader
-chmod +x ~/bin/reloader
+TOOLS=(
+  reloader
+  jnet
+)
+for app in "${TOOLS[@]}"
+do
+  echo
+  echo "----------"
+  echo " [*] downloading $app"
+  echo "----------"
+  curl https://tools.altipla.consulting/tools/$app > ~/bin/$app
+  chmod +x ~/bin/$app
+  echo "----------"
+done
