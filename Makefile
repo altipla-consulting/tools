@@ -18,3 +18,4 @@ update-deps:
 gofmt:
 	@gofmt -s -w $(FILES)
 	@gofmt -r '&α{} -> new(α)' -w $(FILES)
+	@tool/impsort cmd -p tools.altipla.consulting
