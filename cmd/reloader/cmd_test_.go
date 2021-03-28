@@ -13,14 +13,15 @@ import (
 )
 
 var (
-	flagVerbose bool
-	flagRun     string
+	flagVerbose       bool
+	flagRun, flagTags string
 )
 
 func init() {
 	CmdRoot.AddCommand(CmdTest)
 	CmdTest.PersistentFlags().BoolVarP(&flagVerbose, "verbose", "v", false, "Verbose run of the go tests")
 	CmdTest.PersistentFlags().StringVarP(&flagRun, "run", "r", "", "Run only those tests and examples matching the regular expression.")
+	CmdTest.PersistentFlags().StringVarP(&flagTags, "tags", "t", "", "Tags for the go build command")
 }
 
 var CmdTest = &cobra.Command{
@@ -73,6 +74,9 @@ var CmdTest = &cobra.Command{
 					}
 					if flagRun != "" {
 						runCmd = append(runCmd, "-run", flagRun)
+					}
+					if flagTags != "" {
+						runCmd = append(runCmd, "-tags", flagTags)
 					}
 					runCmd = append(runCmd, args...)
 					cmd := exec.CommandContext(ctx, "go", runCmd...)
