@@ -12,5 +12,6 @@ require (
 	github.com/spf13/pflag v1.0.5
 	golang.org/x/oauth2 v0.0.0-20200902213428-5d25da1a8d43
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+	golang.org/x/tools v0.0.0-20200925191224-5d1fdd8fa346
 	libs.altipla.consulting v1.76.1
 )

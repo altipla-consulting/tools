@@ -6,6 +6,7 @@ mkdir -p ~/bin
 
 TOOLS=(
   ci
+  impsort
   jnet
   reloader
 )
