@@ -5,10 +5,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var debugApp bool
+var flagDebug bool
 
 func init() {
-	CmdRoot.PersistentFlags().BoolVarP(&debugApp, "debug", "d", false, "Activa el logging de depuración")
+	CmdRoot.PersistentFlags().BoolVarP(&flagDebug, "debug", "d", false, "Activa el logging de depuración")
 
 	CmdRoot.AddCommand(CmdCheckout)
 	CmdRoot.AddCommand(CmdCheckoutShort)
@@ -23,7 +23,7 @@ var CmdRoot = &cobra.Command{
 	SilenceUsage:  true,
 	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		if debugApp {
+		if flagDebug {
 			log.SetLevel(log.DebugLevel)
 			log.Debug("DEBUG log level activated")
 		}
