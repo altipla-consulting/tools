@@ -23,6 +23,7 @@ var CmdRoot = &cobra.Command{
 	SilenceUsage:  true,
 	SilenceErrors: true,
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		log.SetFormatter(&log.TextFormatter{})
 		if flagDebug {
 			log.SetLevel(log.DebugLevel)
 			log.Debug("DEBUG log level activated")
