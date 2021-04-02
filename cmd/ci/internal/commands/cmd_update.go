@@ -11,6 +11,12 @@ import (
 	"tools.altipla.consulting/cmd/ci/internal/run"
 )
 
+var flagForce bool
+
+func init() {
+	CmdUpdate.Flags().BoolVarP(&flagForce, "force", "f", false, "Fuerza la actualización aunque haya cambios pendientes. WARNING: Es una operación destructiva.")
+}
+
 var CmdUpdate = &cobra.Command{
 	Use:   "update",
 	Short: "Actualiza a la última versión de master borrando todo lo que haya en local",
@@ -28,7 +34,7 @@ var CmdUpdate = &cobra.Command{
 		if err != nil {
 			return errors.Trace(err)
 		}
-		if len(status) > 0 {
+		if len(status) > 0 && !flagForce {
 			keep, err := prompt.Confirm(fmt.Sprintf("El proyecto tiene cambios. ¿Estás seguro de que deseas borrar todo y pasar a %s?", mainBranch))
 			if err != nil {
 				return errors.Trace(err)
