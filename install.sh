@@ -8,6 +8,7 @@ TOOLS=(
   ci
   impsort
   jnet
+  linter
   reloader
 )
 for app in "${TOOLS[@]}"

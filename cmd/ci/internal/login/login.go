@@ -45,7 +45,7 @@ func Start(ctx context.Context) error {
 		fmt.Fprintln(w, "Cierra esta pestaña. La autenticación ya ha terminado.")
 		go func() {
 			time.Sleep(2 * time.Second)
-			server.Close()
+			_ = server.Close()
 		}()
 
 		token, err := conf.Exchange(ctx, r.FormValue("code"))

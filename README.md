@@ -17,6 +17,7 @@ El pack incluye las siguientes herramientas:
 - [ci](./cmd/ci)
 - [impsort](./cmd/impsort)
 - [jnet](./cmd/jnet)
+- [linter](./cmd/linter)
 - [reloader](./cmd/reloader)
 
 
