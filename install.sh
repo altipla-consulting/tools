@@ -9,6 +9,7 @@ TOOLS=(
   impsort
   jnet
   linter
+  pub
   reloader
 )
 for app in "${TOOLS[@]}"
