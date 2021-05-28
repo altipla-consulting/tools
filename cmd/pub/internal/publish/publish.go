@@ -101,7 +101,24 @@ func runTests(tr *tracker) error {
 
 func incrementVersion(tr *tracker) error {
 	tr.Announce("Increment package.json version")
-	return errors.Trace(run.CheckSuccess("npm", "version", tr.NextVersion, "-m", "Release %s"))
+
+	content, err := ioutil.ReadFile(".npmrc")
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return errors.Trace(err)
+		}
+
+		defer os.Remove(".npmrc")
+	} else {
+		defer ioutil.WriteFile(".npmrc", content, 0600)
+	}
+
+	result := append(content, []byte("\ngit-tag-version=false\n")...)
+	if err := ioutil.WriteFile(".npmrc", result, 0600); err != nil {
+		return errors.Trace(err)
+	}
+
+	return errors.Trace(run.CheckSuccess("npm", "version", tr.NextVersion))
 }
 
 func publishPackage(tr *tracker) error {
@@ -118,8 +135,8 @@ func publishPackage(tr *tracker) error {
 		defer ioutil.WriteFile(".npmrc", content, 0600)
 	}
 
-	auth := append(content, []byte("\nregistry=https://registry.npmjs.org/\n//registry.npmjs.org/:_authToken="+os.Getenv("NPM_TOKEN")+"\n")...)
-	if err := ioutil.WriteFile(".npmrc", auth, 0600); err != nil {
+	result := append(content, []byte("\nregistry=https://registry.npmjs.org/\n//registry.npmjs.org/:_authToken="+os.Getenv("NPM_TOKEN")+"\n")...)
+	if err := ioutil.WriteFile(".npmrc", result, 0600); err != nil {
 		return errors.Trace(err)
 	}
 
