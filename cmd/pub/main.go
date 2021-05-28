@@ -14,7 +14,6 @@ import (
 )
 
 func main() {
-
 	if err := run(); err != nil {
 		log.Error(err.Error())
 		log.Debug(errors.Stack(err))
@@ -45,27 +44,6 @@ func run() error {
 		"package": pkg.Name,
 	}).Info("Release new version for NPM package")
 
-	content, err := ioutil.ReadFile(".npmrc")
-	if err != nil {
-		if !os.IsNotExist(err) {
-			return errors.Trace(err)
-		}
-		defer os.Remove(".npmrc")
-	} else {
-		defer ioutil.WriteFile(".npmrc", content, 0600)
-	}
-	newlines := []string{
-		"",
-		"git-tag-version=false",
-		"registry=https://registry.npmjs.org/",
-		"//registry.npmjs.org/:_authToken=" + os.Getenv("NPM_TOKEN"),
-		"",
-	}
-	result := append(content, []byte(strings.Join(newlines, "\n"))...)
-	if err := ioutil.WriteFile(".npmrc", result, 0600); err != nil {
-		return errors.Trace(err)
-	}
-
 	log.Info("Install NPM dependencies from scratch")
 	if err := runCommand("npm", "ci", "--engine-strict"); err != nil {
 		return errors.Trace(err)
@@ -90,12 +68,36 @@ func run() error {
 	}
 
 	log.Info("Increment package.json version")
-	if err := runCommand("npm", "version", nextVersion); err != nil {
+	if err := runCommand("npm", "version", nextVersion, "-m", "Release v"+nextVersion); err != nil {
 		return errors.Trace(err)
 	}
 
 	log.Info("Publish package to NPM")
+	content, err := ioutil.ReadFile(".npmrc")
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return errors.Trace(err)
+		}
+		defer os.Remove(".npmrc")
+	} else {
+		defer ioutil.WriteFile(".npmrc", content, 0600)
+	}
+	newlines := []string{
+		"",
+		"registry=https://registry.npmjs.org/",
+		"//registry.npmjs.org/:_authToken=" + os.Getenv("NPM_TOKEN"),
+		"",
+	}
+	result := append(content, []byte(strings.Join(newlines, "\n"))...)
+	if err := ioutil.WriteFile(".npmrc", result, 0600); err != nil {
+		return errors.Trace(err)
+	}
 	if err := runCommand("npm", "publish", "--access", "public"); err != nil {
+		return errors.Trace(err)
+	}
+
+	log.Info("Push commit updating version to Gerrit")
+	if err := runCommand("ci", "push"); err != nil {
 		return errors.Trace(err)
 	}
 
