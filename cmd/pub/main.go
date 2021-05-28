@@ -79,6 +79,7 @@ func run() error {
 	}
 	newlines := []string{
 		"",
+		"git-tag-version=false",
 		"registry=https://registry.npmjs.org/",
 		"//registry.npmjs.org/:_authToken=" + os.Getenv("NPM_TOKEN"),
 		"",
