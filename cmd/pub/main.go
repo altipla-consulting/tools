@@ -67,12 +67,7 @@ func run() error {
 		}
 	}
 
-	log.Info("Increment package.json version")
-	if err := runCommand("npm", "version", nextVersion); err != nil {
-		return errors.Trace(err)
-	}
-
-	log.Info("Publish package to NPM")
+	log.Info("Configure NPM to release the package")
 	content, err := ioutil.ReadFile(".npmrc")
 	if err != nil {
 		if !os.IsNotExist(err) {
@@ -92,6 +87,13 @@ func run() error {
 	if err := ioutil.WriteFile(".npmrc", result, 0600); err != nil {
 		return errors.Trace(err)
 	}
+
+	log.Info("Increment package.json version")
+	if err := runCommand("npm", "version", nextVersion); err != nil {
+		return errors.Trace(err)
+	}
+
+	log.Info("Publish package to NPM")
 	if err := runCommand("npm", "publish", "--access", "public"); err != nil {
 		return errors.Trace(err)
 	}
