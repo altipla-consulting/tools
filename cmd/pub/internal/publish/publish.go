@@ -100,6 +100,7 @@ func runTests(tr *tracker) error {
 }
 
 func incrementVersion(tr *tracker) error {
+	tr.Announce("Increment package.json version")
 	return errors.Trace(run.CheckSuccess("npm", "version", tr.NextVersion, "-m", "Release %s"))
 }
 
