@@ -33,7 +33,6 @@ func Run() error {
 		runTests,
 		incrementVersion,
 		publishPackage,
-		pushCommit,
 	}
 
 	pkg, err := readPackageJSON()
@@ -141,9 +140,4 @@ func publishPackage(tr *tracker) error {
 	}
 
 	return errors.Trace(run.CheckSuccess("npm", "publish", "--access", "public"))
-}
-
-func pushCommit(tr *tracker) error {
-	tr.Announce("Push git commit")
-	return errors.Trace(run.CheckSuccess("ci", "push"))
 }
