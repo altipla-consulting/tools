@@ -44,29 +44,6 @@ func run() error {
 		"package": pkg.Name,
 	}).Info("Release new version for NPM package")
 
-	log.Info("Install NPM dependencies from scratch")
-	if err := runCommand("npm", "ci", "--engine-strict"); err != nil {
-		return errors.Trace(err)
-	}
-
-	log.Info("Run linter")
-	if pkg.Scripts.Lint == "" {
-		log.Warning("There is no linter defined in the `npm run lint` script. Skipping step")
-	} else {
-		if err := runCommand("npm", "run", "lint"); err != nil {
-			return errors.Trace(err)
-		}
-	}
-
-	log.Info("Run tests")
-	if pkg.Scripts.Test == "" {
-		log.Warning("There are no tests defined in the `npm test` script. Skipping step")
-	} else {
-		if err := runCommand("npm", "test"); err != nil {
-			return errors.Trace(err)
-		}
-	}
-
 	log.Info("Configure NPM to release the package")
 	content, err := ioutil.ReadFile(".npmrc")
 	if err != nil {
