@@ -78,7 +78,7 @@ func run() error {
 		"-p", gerrit.Port,
 		fmt.Sprintf("%s@%s", gerrit.BotUsername, gerrit.Host),
 		"gerrit", "review", fmt.Sprintf("%v,%v", gerrit.ChangeNumber, gerrit.PatchSetNumber),
-		"--message", "Previsualización desplegada en Netlify:\n" + deployURL,
+		"--message", `"Previsualización desplegada en Netlify:` + "\n" + deployURL + `"`,
 	}
 	cmd = exec.Command(args[0], args[1:]...)
 	cmd.Stdout = os.Stdout
