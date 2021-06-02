@@ -72,19 +72,21 @@ func run() error {
 	}
 	deployURL := deployment["deploy_url"].(string)
 
-	log.Info("Send preview URL as a Gerrit comment")
-	args = []string{
-		"ssh",
-		"-p", gerrit.Port,
-		fmt.Sprintf("%s@%s", gerrit.BotUsername, gerrit.Host),
-		"gerrit", "review", fmt.Sprintf("%v,%v", gerrit.ChangeNumber, gerrit.PatchSetNumber),
-		"--message", `"Previsualización desplegada en Netlify:` + deployURL + `"`,
-	}
-	cmd = exec.Command(args[0], args[1:]...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		return errors.Trace(err)
+	if !flagProduction {
+		log.Info("Send preview URL as a Gerrit comment")
+		args = []string{
+			"ssh",
+			"-p", gerrit.Port,
+			fmt.Sprintf("%s@%s", gerrit.BotUsername, gerrit.Host),
+			"gerrit", "review", fmt.Sprintf("%v,%v", gerrit.ChangeNumber, gerrit.PatchSetNumber),
+			"--message", `"Previsualización desplegada en Netlify:` + deployURL + `"`,
+		}
+		cmd = exec.Command(args[0], args[1:]...)
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err := cmd.Run(); err != nil {
+			return errors.Trace(err)
+		}
 	}
 
 	return nil
