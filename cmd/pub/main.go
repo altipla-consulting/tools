@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -32,7 +33,8 @@ func run() error {
 		log.Debug("DEBUG log level activated")
 	}
 
-	nextVersion := filepath.Base(os.Getenv("GERRIT_REFNAME"))
+	gerrit := readGerritInfo()
+	nextVersion := filepath.Base(gerrit.RefName)
 
 	pkg, err := readPackageJSON()
 	if err != nil {
@@ -77,6 +79,9 @@ func run() error {
 	}
 
 	log.Info("Push commit updating version to Gerrit")
+	if err := runCommand("scp", "-p", "-P", gerrit.Port, fmt.Sprintf("%s@%s:hooks/commit-msg", gerrit.BotUsername, gerrit.Host), ".git/hooks/"); err != nil {
+		return errors.Trace(err)
+	}
 	if err := runCommand("git", "add", "package.json", "package-lock.json"); err != nil {
 		return errors.Trace(err)
 	}
@@ -84,6 +89,11 @@ func run() error {
 		return errors.Trace(err)
 	}
 	if err := runCommand("ci", "push"); err != nil {
+		return errors.Trace(err)
+	}
+
+	log.Info("Assign reviewers to the commit")
+	if err := runCommand("ssh", fmt.Sprintf("%s@%s", gerrit.BotUsername, gerrit.Host), "-p", gerrit.Port, "gerrit", "set-reviewers", gerrit.ChangeNumber, "-a", gerrit.ReviewersGroup); err != nil {
 		return errors.Trace(err)
 	}
 
@@ -121,4 +131,24 @@ func runCommand(command ...string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return errors.Trace(cmd.Run())
+}
+
+type gerritInfo struct {
+	BotUsername    string
+	RefName        string
+	Host           string
+	Port           string
+	ChangeNumber   string
+	ReviewersGroup string
+}
+
+func readGerritInfo() gerritInfo {
+	return gerritInfo{
+		BotUsername:    os.Getenv("GERRIT_BOT_USERNAME"),
+		RefName:        os.Getenv("GERRIT_REFNAME"),
+		Host:           os.Getenv("GERRIT_HOST"),
+		Port:           os.Getenv("GERRIT_PORT"),
+		ChangeNumber:   os.Getenv("GERRIT_CHANGE_NUMBER"),
+		ReviewersGroup: os.Getenv("GERRIT_REVIEWERS_GROUP"),
+	}
 }
