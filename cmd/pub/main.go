@@ -93,7 +93,13 @@ func run() error {
 	}
 
 	log.Info("Assign reviewers to the commit")
-	if err := runCommand("ssh", fmt.Sprintf("%s@%s", gerrit.BotUsername, gerrit.Host), "-p", gerrit.Port, "gerrit", "set-reviewers", gerrit.ChangeNumber, "-a", gerrit.ReviewersGroup); err != nil {
+	cmd := exec.Command("git", "rev-parse", "HEAD")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return errors.Trace(err)
+	}
+	commit := strings.TrimSpace(string(output))
+	if err := runCommand("ssh", fmt.Sprintf("%s@%s", gerrit.BotUsername, gerrit.Host), "-p", gerrit.Port, "gerrit", "set-reviewers", commit, "-a", gerrit.ReviewersGroup); err != nil {
 		return errors.Trace(err)
 	}
 
@@ -138,7 +144,6 @@ type gerritInfo struct {
 	RefName        string
 	Host           string
 	Port           string
-	ChangeNumber   string
 	ReviewersGroup string
 }
 
@@ -148,7 +153,6 @@ func readGerritInfo() gerritInfo {
 		RefName:        os.Getenv("GERRIT_REFNAME"),
 		Host:           os.Getenv("GERRIT_HOST"),
 		Port:           os.Getenv("GERRIT_PORT"),
-		ChangeNumber:   os.Getenv("GERRIT_CHANGE_NUMBER"),
 		ReviewersGroup: os.Getenv("GERRIT_REVIEWERS_GROUP"),
 	}
 }
