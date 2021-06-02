@@ -50,27 +50,35 @@ func run() error {
 	lastCommit := strings.TrimSpace(strings.Join(filtered, "\n"))
 
 	log.Info("Deploy to netlify")
-	cmd = exec.Command("netlify", "deploy", "--dir", "dist", "--json", "--message", lastCommit)
+	args := []string{
+		"netlify",
+		"deploy",
+		"--dir", "dist",
+		"--json",
+		"--message", lastCommit,
+	}
+	if flagProduction {
+		args = append(args, "--prod")
+	}
+	cmd = exec.Command(args[0], args[1:]...)
 	output, err = cmd.CombinedOutput()
 	if err != nil {
 		return errors.Trace(err)
 	}
 	var deployment map[string]interface{}
 	if err := json.Unmarshal(output, &deployment); err != nil {
+		log.Warningf("Cannot parse Netlify output:\n%s", output)
 		return errors.Trace(err)
 	}
 	deployURL := deployment["deploy_url"].(string)
 
 	log.Info("Send preview URL as a Gerrit comment")
-	args := []string{
+	args = []string{
 		"ssh",
 		"-p", gerrit.Port,
 		fmt.Sprintf("%s@%s", gerrit.BotUsername, gerrit.Host),
 		"gerrit", "review", fmt.Sprintf("%v,%v", gerrit.ChangeNumber, gerrit.PatchSetNumber),
 		"--message", "Previsualización desplegada en Netlify:\n" + deployURL,
-	}
-	if flagProduction {
-		args = append(args, "--prod")
 	}
 	cmd = exec.Command(args[0], args[1:]...)
 	cmd.Stdout = os.Stdout
