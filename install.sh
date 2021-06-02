@@ -9,6 +9,7 @@ TOOLS=(
   impsort
   jnet
   linter
+  previewer-netlify
   pub
   reloader
 )
