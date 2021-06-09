@@ -49,7 +49,7 @@ func run() error {
 	}
 	lastCommit := strings.TrimSpace(strings.Join(filtered, "\n"))
 
-	log.Info("Deploy to netlify")
+	log.Info("Deploy to Netlify")
 	args := []string{
 		"netlify",
 		"deploy",
