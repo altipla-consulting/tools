@@ -61,6 +61,8 @@ func run() error {
 		"git-tag-version=false",
 		"registry=https://registry.npmjs.org/",
 		"//registry.npmjs.org/:_authToken=" + os.Getenv("NPM_TOKEN"),
+		"//npm.pkg.github.com/:_authToken=" + os.Getenv("GITHUB_NPM_TOKEN"),
+		"@altipla-consulting:registry=https://npm.pkg.github.com",
 		"",
 	}
 	result := append(content, []byte(strings.Join(newlines, "\n"))...)
