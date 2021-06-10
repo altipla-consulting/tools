@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -45,30 +44,6 @@ func run() error {
 		"next":    nextVersion,
 		"package": pkg.Name,
 	}).Info("Release new version for NPM package")
-
-	log.Info("Configure NPM to release the package")
-	content, err := ioutil.ReadFile(".npmrc")
-	if err != nil {
-		if !os.IsNotExist(err) {
-			return errors.Trace(err)
-		}
-		defer os.Remove(".npmrc")
-	} else {
-		defer ioutil.WriteFile(".npmrc", content, 0600)
-	}
-	newlines := []string{
-		"",
-		"git-tag-version=false",
-		"registry=https://registry.npmjs.org/",
-		"//registry.npmjs.org/:_authToken=" + os.Getenv("NPM_TOKEN"),
-		"//npm.pkg.github.com/:_authToken=" + os.Getenv("GITHUB_NPM_TOKEN"),
-		"@altipla-consulting:registry=https://npm.pkg.github.com",
-		"",
-	}
-	result := append(content, []byte(strings.Join(newlines, "\n"))...)
-	if err := ioutil.WriteFile(".npmrc", result, 0600); err != nil {
-		return errors.Trace(err)
-	}
 
 	log.Info("Increment package.json version")
 	if err := runCommand("npm", "version", nextVersion); err != nil {
