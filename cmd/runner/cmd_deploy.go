@@ -54,12 +54,17 @@ var cmdDeploy = &cobra.Command{
 		version := time.Now().Format("20060102") + "." + os.Getenv("BUILD_NUMBER")
 
 		for _, app := range args {
-			logger := log.WithFields(log.Fields{
-				"name":    app,
-				"version": version,
-			})
+			serviceAccount := flagServiceAccount
+			if serviceAccount == "" {
+				serviceAccount = app
+			}
 
-			logger.Info("Deploy app")
+			log.WithFields(log.Fields{
+				"name":            app,
+				"version":         version,
+				"memory":          flagMemory,
+				"service-account": serviceAccount,
+			}).Info("Deploy app")
 			build := exec.Command(
 				"gcloud",
 				"run", "deploy",
@@ -69,7 +74,7 @@ var cmdDeploy = &cobra.Command{
 				"--platform", "managed",
 				"--concurrency", "50",
 				"--timeout", "60s",
-				"--service-account", flagServiceAccount+"@"+flagDeployProject+".iam.gserviceaccount.com",
+				"--service-account", serviceAccount+"@"+flagDeployProject+".iam.gserviceaccount.com",
 				"--max-instances", "20",
 				"--memory", flagMemory,
 				"--set-env-vars", "SENTRY_DSN="+keys[0].DSN.Public,
