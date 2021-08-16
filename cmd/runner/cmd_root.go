@@ -16,9 +16,7 @@ var cmdRoot = &cobra.Command{
 	Short:        "Publish Cloud Run applications.",
 	SilenceUsage: true,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		log.SetFormatter(&log.TextFormatter{
-			ForceColors: true,
-		})
+		log.SetFormatter(new(log.TextFormatter))
 		if flagDebug {
 			log.SetLevel(log.DebugLevel)
 		}
