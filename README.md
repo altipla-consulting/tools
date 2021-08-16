@@ -20,6 +20,7 @@ El pack incluye las siguientes herramientas:
 - [linter](./cmd/linter)
 - [pub](./cmd/pub)
 - [reloader](./cmd/reloader)
+- [runner](./cmd/runner)
 
 
 ## Contributing
