@@ -51,14 +51,14 @@ var cmdBuild = &cobra.Command{
 			}
 
 			logger.Info("Push to Container Registry")
-			push := exec.Command("docker", "push", "-t", "eu.gcr.io/"+flagBuildProject+"/"+app+":latest")
+			push := exec.Command("docker", "push", "eu.gcr.io/"+flagBuildProject+"/"+app+":latest")
 			push.Stdout = os.Stdout
 			push.Stderr = os.Stderr
 			if err := push.Run(); err != nil {
 				return errors.Trace(err)
 			}
 
-			push = exec.Command("docker", "push", "-t", "eu.gcr.io/"+flagBuildProject+"/"+app+":"+version)
+			push = exec.Command("docker", "push", "eu.gcr.io/"+flagBuildProject+"/"+app+":"+version)
 			push.Stdout = os.Stdout
 			push.Stderr = os.Stderr
 			if err := push.Run(); err != nil {
