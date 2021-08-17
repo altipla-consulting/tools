@@ -64,7 +64,7 @@ var cmdDeploy = &cobra.Command{
 		if os.Getenv("BUILD_CAUSE") == "SCMTRIGGER" {
 			version += ".preview"
 			if flagDeploy.Tag == "" {
-				flagDeploy.Tag = os.Getenv("GERRIT_CHANGE_NUMBER") + "-" + os.Getenv("GERRIT_PATCHSET_NUMBER")
+				flagDeploy.Tag = "preview-" + os.Getenv("GERRIT_CHANGE_NUMBER") + "-" + os.Getenv("GERRIT_PATCHSET_NUMBER")
 			}
 		}
 
