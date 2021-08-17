@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/atlassian/go-sentry-api"
@@ -16,14 +17,16 @@ var (
 	flagMemory         string
 	flagServiceAccount string
 	flagSentry         string
+	flagVolumeSecrets  []string
 )
 
 func init() {
 	cmdRoot.AddCommand(cmdDeploy)
-	cmdDeploy.PersistentFlags().StringVarP(&flagDeployProject, "project", "p", "", "Google Cloud project where the container will be stored.")
-	cmdDeploy.PersistentFlags().StringVarP(&flagMemory, "memory", "m", "256Mi", "Memory available inside the Cloud Run application.")
-	cmdDeploy.PersistentFlags().StringVarP(&flagServiceAccount, "service-account", "a", "", "Service account. Defaults to one with the name of the application.")
-	cmdDeploy.PersistentFlags().StringVarP(&flagSentry, "sentry", "s", "", "Sentry project to configure.")
+	cmdDeploy.PersistentFlags().StringVar(&flagDeployProject, "project", "", "Google Cloud project where the container will be stored.")
+	cmdDeploy.PersistentFlags().StringVar(&flagMemory, "memory", "256Mi", "Memory available inside the Cloud Run application.")
+	cmdDeploy.PersistentFlags().StringVar(&flagServiceAccount, "service-account", "", "Service account. Defaults to one with the name of the application.")
+	cmdDeploy.PersistentFlags().StringVar(&flagSentry, "sentry", "", "Sentry project to configure.")
+	cmdDeploy.PersistentFlags().StringSliceVar(&flagVolumeSecrets, "volume-secret", nil, "Secrets to mount as volumes-")
 }
 
 var cmdDeploy = &cobra.Command{
@@ -65,21 +68,30 @@ var cmdDeploy = &cobra.Command{
 				"memory":          flagMemory,
 				"service-account": serviceAccount,
 			}).Info("Deploy app")
-			build := exec.Command(
-				"gcloud",
+
+			args := []string{
 				"run", "deploy",
 				app,
-				"--image", "eu.gcr.io/"+flagDeployProject+"/"+app+":"+version,
+				"--image", "eu.gcr.io/" + flagDeployProject + "/" + app + ":" + version,
 				"--region", "europe-west1",
 				"--platform", "managed",
 				"--concurrency", "50",
 				"--timeout", "60s",
-				"--service-account", serviceAccount+"@"+flagDeployProject+".iam.gserviceaccount.com",
+				"--service-account", serviceAccount + "@" + flagDeployProject + ".iam.gserviceaccount.com",
 				"--max-instances", "20",
 				"--memory", flagMemory,
-				"--set-env-vars", "SENTRY_DSN="+keys[0].DSN.Public,
-				"--labels", "app="+app,
-			)
+				"--set-env-vars", "SENTRY_DSN=" + keys[0].DSN.Public,
+				"--labels", "app=" + app,
+			}
+			if len(flagVolumeSecrets) > 0 {
+				var secrets []string
+				for _, secret := range flagVolumeSecrets {
+					secrets = append(secrets, "/etc/secrets/"+secret+"="+secret+":latest")
+				}
+				args = append(args, "--set-secrets", strings.Join(secrets, ","))
+			}
+
+			build := exec.Command("gcloud", args...)
 			build.Stdout = os.Stdout
 			build.Stderr = os.Stderr
 			if err := build.Run(); err != nil {
