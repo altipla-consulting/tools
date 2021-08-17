@@ -137,6 +137,7 @@ var cmdDeploy = &cobra.Command{
 			for _, app := range args {
 				previews = append(previews, "https://"+flagDeploy.Tag+"---"+app+"-"+suffix+"-ew.a.run.app/")
 			}
+			log.WithField("previews", previews).Debug("Send comment to Gerrit with the previews")
 
 			log.Info("Send preview URLs as a Gerrit comment")
 			gerrit := readGerritInfo()
@@ -147,6 +148,7 @@ var cmdDeploy = &cobra.Command{
 				"gerrit", "review", fmt.Sprintf("%v,%v", gerrit.ChangeNumber, gerrit.PatchSetNumber),
 				"--message", `"Previews deployed at:` + "\n" + strings.Join(previews, "\n") + `"`,
 			}
+			log.Debug(strings.Join(args, " "))
 			comment := exec.Command(args[0], args[1:]...)
 			comment.Stdout = os.Stdout
 			comment.Stderr = os.Stderr
