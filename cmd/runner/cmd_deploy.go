@@ -22,7 +22,7 @@ type deployFlags struct {
 }
 
 var (
-	flagDeploy *deployFlags
+	flagDeploy deployFlags
 )
 
 func init() {
