@@ -7,6 +7,8 @@ require (
 	github.com/atlassian/go-sentry-api v0.0.0-20210507210027-8175592dcf60
 	github.com/google/go-github/v32 v32.1.0
 	github.com/google/go-jsonnet v0.17.0
+	github.com/hashicorp/hcl/v2 v2.10.1
+	github.com/kyokomi/emoji/v2 v2.2.8
 	github.com/mgechev/dots v0.0.0-20190921121421-c36f7dcfbb81
 	github.com/mgechev/revive v1.0.7
 	github.com/segmentio/ksuid v1.0.3
