@@ -132,6 +132,7 @@ var cmdDeploy = &cobra.Command{
 					app,
 					"--project", flagDeploy.Project,
 					"--region", "europe-west1",
+					"--to-latest",
 				)
 				traffic.Stdout = os.Stdout
 				traffic.Stderr = os.Stderr
