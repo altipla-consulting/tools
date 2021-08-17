@@ -90,7 +90,6 @@ var cmdDeploy = &cobra.Command{
 				"--concurrency", "50",
 				"--timeout", "60s",
 				"--service-account", serviceAccount + "@" + flagDeploy.Project + ".iam.gserviceaccount.com",
-				"--max-instances", "20",
 				"--memory", flagDeploy.Memory,
 				"--set-env-vars", "SENTRY_DSN=" + keys[0].DSN.Public,
 				"--labels", "app=" + app,
@@ -103,7 +102,11 @@ var cmdDeploy = &cobra.Command{
 				args = append(args, "--set-secrets", strings.Join(secrets, ","))
 			}
 			if flagDeploy.Tag != "" {
-				args = append(args, "--no-traffic", "--tag", flagDeploy.Tag)
+				args = append(args, "--no-traffic")
+				args = append(args, "--max-instances", "1")
+				args = append(args, "--tag", flagDeploy.Tag)
+			} else {
+				args = append(args, "--max-instances", "20")
 			}
 
 			log.Debug(strings.Join(append([]string{"gcloud"}, args...), " "))
