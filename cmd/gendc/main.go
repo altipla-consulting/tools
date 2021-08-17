@@ -26,7 +26,8 @@ type configFile struct {
 }
 
 type configApp struct {
-	Name string `hcl:"name,label"`
+	Name      string   `hcl:"name,label"`
+	DependsOn []string `hcl:"depends_on,optional"`
 }
 
 func run() error {
@@ -129,6 +130,7 @@ func writeDockerCompose(settings *configFile) error {
 			},
 			User:       os.Getenv("USR_ID") + ":" + os.Getenv("GRP_ID"),
 			WorkingDir: "/workspace/" + app.Name,
+			DependsOn:  app.DependsOn,
 		}
 	}
 

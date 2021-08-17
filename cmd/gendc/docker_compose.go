@@ -13,9 +13,10 @@ type dcService struct {
 	Ports      []string          `json:"ports,omitempty"`
 	StopSignal string            `json:"stop_signal,omitempty"`
 	Env        map[string]string `json:"environment"`
-	Volumes    []string          `json:"volumes"`
+	Volumes    []string          `json:"volumes,omitempty"`
 	User       string            `json:"user,omitempty"`
 	WorkingDir string            `json:"working_dir,omitempty"`
+	DependsOn  []string          `json:"depends_on,omitempty"`
 }
 
 func (svc *dcService) ExposePort(port int) {
