@@ -122,7 +122,14 @@ var cmdDeploy = &cobra.Command{
 		}
 
 		if os.Getenv("BUILD_CAUSE") == "SCMTRIGGER" {
-			suffixcmd := exec.Command("gcloud", "run", "services", "describe", args[0], "--format", "value(status.url)", "--region", "europe-west1-b")
+			suffixcmd := exec.Command(
+				"gcloud",
+				"run", "services", "describe",
+				args[0],
+				"--format", "value(status.url)",
+				"--region", "europe-west1-b",
+				"--project", flagDeploy.Project,
+			)
 			output, err := suffixcmd.CombinedOutput()
 			if err != nil {
 				log.Error(string(output))
