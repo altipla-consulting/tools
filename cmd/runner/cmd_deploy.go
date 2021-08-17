@@ -91,6 +91,8 @@ var cmdDeploy = &cobra.Command{
 				args = append(args, "--set-secrets", strings.Join(secrets, ","))
 			}
 
+			log.Debug(strings.Join(append([]string{"gcloud"}, args...), " "))
+
 			build := exec.Command("gcloud", args...)
 			build.Stdout = os.Stdout
 			build.Stderr = os.Stderr
