@@ -125,6 +125,7 @@ var cmdDeploy = &cobra.Command{
 			suffixcmd := exec.Command("gcloud", "run", "services", "describe", args[0], "--format", "value(status.url)")
 			output, err := suffixcmd.CombinedOutput()
 			if err != nil {
+				log.Error(string(output))
 				return errors.Trace(err)
 			}
 			u, err := url.Parse(strings.TrimSpace(string(output)))
