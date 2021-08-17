@@ -102,8 +102,10 @@ var cmdDeploy = &cobra.Command{
 				gcloud = append(gcloud, "--set-secrets", strings.Join(secrets, ","))
 			}
 			if flagDeploy.Tag != "" {
-				gcloud = append(gcloud, "--no-traffic")
-				gcloud = append(gcloud, "--max-instances", "1")
+				if os.Getenv("BUILD_CAUSE") == "SCMTRIGGER" {
+					gcloud = append(gcloud, "--no-traffic")
+					gcloud = append(gcloud, "--max-instances", "1")
+				}
 				gcloud = append(gcloud, "--tag", flagDeploy.Tag)
 			} else {
 				gcloud = append(gcloud, "--max-instances", "20")
@@ -116,6 +118,26 @@ var cmdDeploy = &cobra.Command{
 			build.Stderr = os.Stderr
 			if err := build.Run(); err != nil {
 				return errors.Trace(err)
+			}
+
+			if os.Getenv("BUILD_CAUSE") != "SCMTRIGGER" {
+				log.WithFields(log.Fields{
+					"name":    app,
+					"version": version,
+				}).Info("Enable traffic to latest version of the app")
+
+				traffic := exec.Command(
+					"gcloud",
+					"run", "services", "update-traffic",
+					app,
+					"--project", flagDeploy.Project,
+					"--region", "europe-west1",
+				)
+				traffic.Stdout = os.Stdout
+				traffic.Stderr = os.Stderr
+				if err := traffic.Run(); err != nil {
+					return errors.Trace(err)
+				}
 			}
 		}
 
