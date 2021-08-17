@@ -83,7 +83,7 @@ var cmdDeploy = &cobra.Command{
 				"service-account": serviceAccount,
 			}).Info("Deploy app")
 
-			args := []string{
+			gcloud := []string{
 				"beta", "run", "deploy",
 				app,
 				"--image", "eu.gcr.io/" + flagDeploy.Project + "/" + app + ":" + version,
@@ -101,19 +101,19 @@ var cmdDeploy = &cobra.Command{
 				for _, secret := range flagDeploy.VolumeSecret {
 					secrets = append(secrets, "/etc/secrets/"+secret+"="+secret+":latest")
 				}
-				args = append(args, "--set-secrets", strings.Join(secrets, ","))
+				gcloud = append(gcloud, "--set-secrets", strings.Join(secrets, ","))
 			}
 			if flagDeploy.Tag != "" {
-				args = append(args, "--no-traffic")
-				args = append(args, "--max-instances", "1")
-				args = append(args, "--tag", flagDeploy.Tag)
+				gcloud = append(gcloud, "--no-traffic")
+				gcloud = append(gcloud, "--max-instances", "1")
+				gcloud = append(gcloud, "--tag", flagDeploy.Tag)
 			} else {
-				args = append(args, "--max-instances", "20")
+				gcloud = append(gcloud, "--max-instances", "20")
 			}
 
-			log.Debug(strings.Join(append([]string{"gcloud"}, args...), " "))
+			log.Debug(strings.Join(append([]string{"gcloud"}, gcloud...), " "))
 
-			build := exec.Command("gcloud", args...)
+			build := exec.Command("gcloud", gcloud...)
 			build.Stdout = os.Stdout
 			build.Stderr = os.Stderr
 			if err := build.Run(); err != nil {
@@ -127,7 +127,7 @@ var cmdDeploy = &cobra.Command{
 				"run", "services", "describe",
 				args[0],
 				"--format", "value(status.url)",
-				"--region", "europe-west1-b",
+				"--region", "europe-west1",
 				"--project", flagDeploy.Project,
 			)
 			output, err := suffixcmd.CombinedOutput()
