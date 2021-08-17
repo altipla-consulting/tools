@@ -70,7 +70,7 @@ var cmdDeploy = &cobra.Command{
 			}).Info("Deploy app")
 
 			args := []string{
-				"run", "deploy",
+				"beta", "run", "deploy",
 				app,
 				"--image", "eu.gcr.io/" + flagDeployProject + "/" + app + ":" + version,
 				"--region", "europe-west1",
