@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"net/url"
 	"os"
 	"os/exec"
 	"strings"
@@ -29,7 +27,7 @@ var (
 
 func init() {
 	cmdRoot.AddCommand(cmdDeploy)
-	cmdDeploy.PersistentFlags().StringVar(&flagDeploy.Project, "project", "", "Google Cloud project where the container will be stored.")
+	cmdDeploy.PersistentFlags().StringVar(&flagDeploy.Project, "project", "", "Google Cloud project where the container will be stored. Defaults to the GOOGLE_PROJECT environment variable.")
 	cmdDeploy.PersistentFlags().StringVar(&flagDeploy.Memory, "memory", "256Mi", "Memory available inside the Cloud Run application.")
 	cmdDeploy.PersistentFlags().StringVar(&flagDeploy.ServiceAccount, "service-account", "", "Service account. Defaults to one with the name of the application.")
 	cmdDeploy.PersistentFlags().StringVar(&flagDeploy.Sentry, "sentry", "", "Sentry project to configure.")
@@ -43,7 +41,7 @@ var cmdDeploy = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(command *cobra.Command, args []string) error {
 		if flagDeploy.Project == "" {
-			return errors.Errorf("--project flag is required")
+			flagDeploy.Project = os.Getenv("GOOGLE_PROJECT")
 		}
 		if flagDeploy.Sentry == "" {
 			return errors.Errorf("--sentry flag is required")
@@ -121,72 +119,10 @@ var cmdDeploy = &cobra.Command{
 			}
 		}
 
-		if os.Getenv("BUILD_CAUSE") == "SCMTRIGGER" {
-			suffixcmd := exec.Command(
-				"gcloud",
-				"run", "services", "describe",
-				args[0],
-				"--format", "value(status.url)",
-				"--region", "europe-west1",
-				"--project", flagDeploy.Project,
-			)
-			output, err := suffixcmd.CombinedOutput()
-			if err != nil {
-				log.Error(string(output))
-				return errors.Trace(err)
-			}
-			u, err := url.Parse(strings.TrimSpace(string(output)))
-			if err != nil {
-				return errors.Trace(err)
-			}
-			parts := strings.Split(strings.Split(u.Host, ".")[0], "-")
-			suffix := parts[len(parts)-2]
-			var previews []string
-			for _, app := range args {
-				previews = append(previews, "https://"+flagDeploy.Tag+"---"+app+"-"+suffix+"-ew.a.run.app/")
-			}
-			log.WithField("previews", previews).Debug("Send comment to Gerrit with the previews")
-
-			log.Info("Send preview URLs as a Gerrit comment")
-			gerrit := readGerritInfo()
-			args = []string{
-				"ssh",
-				"-p", gerrit.Port,
-				fmt.Sprintf("%s@%s", gerrit.BotUsername, gerrit.Host),
-				"gerrit", "review", fmt.Sprintf("%v,%v", gerrit.ChangeNumber, gerrit.PatchSetNumber),
-				"--message", `"Previews deployed at:` + "\n" + strings.Join(previews, "\n") + `"`,
-			}
-			log.Debug(strings.Join(args, " "))
-			comment := exec.Command(args[0], args[1:]...)
-			comment.Stdout = os.Stdout
-			comment.Stderr = os.Stderr
-			if err := comment.Run(); err != nil {
-				return errors.Trace(err)
-			}
-		}
-
 		return nil
 	},
 }
 
 func apiString(s string) *string {
 	return &s
-}
-
-type gerritInfo struct {
-	BotUsername    string
-	Host           string
-	Port           string
-	ChangeNumber   string
-	PatchSetNumber string
-}
-
-func readGerritInfo() gerritInfo {
-	return gerritInfo{
-		BotUsername:    os.Getenv("GERRIT_BOT_USERNAME"),
-		Host:           os.Getenv("GERRIT_HOST"),
-		Port:           os.Getenv("GERRIT_PORT"),
-		ChangeNumber:   os.Getenv("GERRIT_CHANGE_NUMBER"),
-		PatchSetNumber: os.Getenv("GERRIT_PATCHSET_NUMBER"),
-	}
 }
