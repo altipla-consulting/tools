@@ -29,7 +29,7 @@ var cmdBuild = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(command *cobra.Command, args []string) error {
 		if flagBuild.Project == "" {
-			flagDeploy.Project = os.Getenv("GOOGLE_PROJECT")
+			flagBuild.Project = os.Getenv("GOOGLE_PROJECT")
 		}
 
 		version := time.Now().Format("20060102") + "." + os.Getenv("BUILD_NUMBER")

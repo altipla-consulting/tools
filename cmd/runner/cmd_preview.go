@@ -34,7 +34,7 @@ var cmdPreview = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(command *cobra.Command, args []string) error {
 		if flagPreview.Project == "" {
-			flagDeploy.Project = os.Getenv("GOOGLE_PROJECT")
+			flagPreview.Project = os.Getenv("GOOGLE_PROJECT")
 		}
 
 		version := time.Now().Format("20060102") + "." + os.Getenv("BUILD_NUMBER")
