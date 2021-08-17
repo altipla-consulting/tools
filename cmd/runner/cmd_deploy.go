@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"net/url"
 	"os"
 	"os/exec"
 	"strings"
@@ -119,10 +121,62 @@ var cmdDeploy = &cobra.Command{
 			}
 		}
 
+		if os.Getenv("BUILD_CAUSE") == "SCMTRIGGER" {
+			suffixcmd := exec.Command("gcloud", "run", "services", "describe", args[0], "--format", "value(status.url)")
+			output, err := suffixcmd.CombinedOutput()
+			if err != nil {
+				return errors.Trace(err)
+			}
+			u, err := url.Parse(strings.TrimSpace(string(output)))
+			if err != nil {
+				return errors.Trace(err)
+			}
+			parts := strings.Split(strings.Split(u.Host, ".")[0], "-")
+			suffix := parts[len(parts)-2]
+			var previews []string
+			for _, app := range args {
+				previews = append(previews, "https://"+flagDeploy.Tag+"---"+app+"-"+suffix+"-ew.a.run.app/")
+			}
+
+			log.Info("Send preview URLs as a Gerrit comment")
+			gerrit := readGerritInfo()
+			args = []string{
+				"ssh",
+				"-p", gerrit.Port,
+				fmt.Sprintf("%s@%s", gerrit.BotUsername, gerrit.Host),
+				"gerrit", "review", fmt.Sprintf("%v,%v", gerrit.ChangeNumber, gerrit.PatchSetNumber),
+				"--message", `"Previews deployed at:` + "\n" + strings.Join(previews, "\n") + `"`,
+			}
+			comment := exec.Command(args[0], args[1:]...)
+			comment.Stdout = os.Stdout
+			comment.Stderr = os.Stderr
+			if err := comment.Run(); err != nil {
+				return errors.Trace(err)
+			}
+		}
+
 		return nil
 	},
 }
 
 func apiString(s string) *string {
 	return &s
+}
+
+type gerritInfo struct {
+	BotUsername    string
+	Host           string
+	Port           string
+	ChangeNumber   string
+	PatchSetNumber string
+}
+
+func readGerritInfo() gerritInfo {
+	return gerritInfo{
+		BotUsername:    os.Getenv("GERRIT_BOT_USERNAME"),
+		Host:           os.Getenv("GERRIT_HOST"),
+		Port:           os.Getenv("GERRIT_PORT"),
+		ChangeNumber:   os.Getenv("GERRIT_CHANGE_NUMBER"),
+		PatchSetNumber: os.Getenv("GERRIT_PATCHSET_NUMBER"),
+	}
 }
