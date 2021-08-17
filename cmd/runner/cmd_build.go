@@ -27,6 +27,9 @@ var cmdBuild = &cobra.Command{
 		}
 
 		version := time.Now().Format("20060102") + "." + os.Getenv("BUILD_NUMBER")
+		if os.Getenv("BUILD_CAUSE") == "SCMTRIGGER" {
+			version += ".preview"
+		}
 
 		for _, app := range args {
 			logger := log.WithFields(log.Fields{
