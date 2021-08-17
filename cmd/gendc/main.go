@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/hcl/v2/hclsimple"
 	"github.com/kyokomi/emoji/v2"
 	log "github.com/sirupsen/logrus"
+	"libs.altipla.consulting/collections"
 	"libs.altipla.consulting/errors"
 )
 
@@ -73,18 +74,8 @@ func writeDockerCompose(settings *configFile) error {
 	log.Println("Generating docker-compose.yml file")
 
 	dc := &dcFile{
-		Version: "3.7",
-		Services: map[string]*dcService{
-			"caddy": {
-				Image: "caddy:2",
-				Ports: []string{"443:443", "80:80"},
-				Env:   map[string]string{},
-				Volumes: []string{
-					"./tmp/gendc/Caddyfile:/etc/caddy/Caddyfile",
-					"./tmp/gendc:/opt/tls",
-				},
-			},
-		},
+		Version:  "3.7",
+		Services: make(map[string]*dcService),
 	}
 
 	for _, service := range settings.Services {
@@ -99,6 +90,17 @@ func writeDockerCompose(settings *configFile) error {
 					"RAVEN_Security_UnsecuredAccessAllowed": "PrivateNetwork",
 				},
 				Ports: []string{"13000:8080"},
+			}
+
+		case "caddy":
+			dc.Services["caddy"] = &dcService{
+				Image: "caddy:2",
+				Ports: []string{"443:443", "80:80"},
+				Env:   map[string]string{},
+				Volumes: []string{
+					"./tmp/gendc/Caddyfile:/etc/caddy/Caddyfile",
+					"./tmp/gendc:/opt/tls",
+				},
 			}
 
 		default:
@@ -152,7 +154,11 @@ func writeDockerCompose(settings *configFile) error {
 }
 
 func writeCaddyfile(settings *configFile) error {
-	log.Println("Generating proxy file")
+	if !collections.HasString(settings.Services, "caddy") {
+		return nil
+	}
+
+	log.Println("Generating Caddyfile configuration")
 
 	var buf bytes.Buffer
 	fmt.Fprintln(&buf)
