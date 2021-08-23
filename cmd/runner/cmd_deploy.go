@@ -18,6 +18,7 @@ type deployFlags struct {
 	ServiceAccount string
 	Sentry         string
 	VolumeSecret   []string
+	EnvSecret      []string
 	Tag            string
 }
 
@@ -32,6 +33,7 @@ func init() {
 	cmdDeploy.PersistentFlags().StringVar(&flagDeploy.ServiceAccount, "service-account", "", "Service account. Defaults to one with the name of the application.")
 	cmdDeploy.PersistentFlags().StringVar(&flagDeploy.Sentry, "sentry", "", "Sentry project to configure.")
 	cmdDeploy.PersistentFlags().StringSliceVar(&flagDeploy.VolumeSecret, "volume-secret", nil, "Secrets to mount as volumes.")
+	cmdDeploy.PersistentFlags().StringSliceVar(&flagDeploy.EnvSecret, "env-secret", nil, "Secrets to mount as environment variables.")
 	cmdDeploy.PersistentFlags().StringVar(&flagDeploy.Tag, "tag", "", "Name of the revision included in the URL. Defaults to the Gerrit change and patchset.")
 }
 
@@ -98,6 +100,10 @@ var cmdDeploy = &cobra.Command{
 				var secrets []string
 				for _, secret := range flagDeploy.VolumeSecret {
 					secrets = append(secrets, "/etc/secrets/"+secret+"="+secret+":latest")
+				}
+				for _, secret := range flagDeploy.EnvSecret {
+					varname := strings.Replace(strings.ToUpper(secret), "-", "_", -1)
+					secrets = append(secrets, varname+"="+secret+":latest")
 				}
 				gcloud = append(gcloud, "--set-secrets", strings.Join(secrets, ","))
 			}
