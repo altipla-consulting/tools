@@ -37,6 +37,10 @@ func run() error {
 		return errors.Trace(err)
 	}
 
+	if err := os.MkdirAll("tmp/gendc", 0700); err != nil {
+		return errors.Trace(err)
+	}
+
 	if err := createCerts(); err != nil {
 		return errors.Trace(err)
 	}
@@ -171,9 +175,6 @@ func writeCaddyfile(settings *configFile) error {
 		fmt.Fprintln(&buf)
 	}
 
-	if err := os.MkdirAll("tmp/gendc", 0700); err != nil {
-		return errors.Trace(err)
-	}
 	if err := ioutil.WriteFile("tmp/gendc/Caddyfile", buf.Bytes(), 0600); err != nil {
 		return errors.Trace(err)
 	}
