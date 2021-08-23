@@ -236,6 +236,9 @@ func watchFolder(ctx context.Context, g *errgroup.Group, changes chan string, fo
 		var paths []string
 		walkFn := func(path string, info os.FileInfo, err error) error {
 			if err != nil {
+				if os.IsNotExist(err) {
+					return nil
+				}
 				return errors.Trace(err)
 			}
 			if !info.IsDir() {
