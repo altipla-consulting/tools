@@ -12,7 +12,7 @@ type dcService struct {
 	Command    []string          `json:"command,omitempty"`
 	Ports      []string          `json:"ports,omitempty"`
 	StopSignal string            `json:"stop_signal,omitempty"`
-	Env        map[string]string `json:"environment"`
+	Env        map[string]string `json:"environment,omitempty"`
 	Volumes    []string          `json:"volumes,omitempty"`
 	User       string            `json:"user,omitempty"`
 	WorkingDir string            `json:"working_dir,omitempty"`
