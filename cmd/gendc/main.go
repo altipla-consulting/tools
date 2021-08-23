@@ -27,8 +27,9 @@ type configFile struct {
 }
 
 type configApp struct {
-	Name      string   `hcl:"name,label"`
-	DependsOn []string `hcl:"depends_on,optional"`
+	Name      string            `hcl:"name,label"`
+	DependsOn []string          `hcl:"depends_on,optional"`
+	Env       map[string]string `hcl:"env,optional"`
 }
 
 func run() error {
@@ -100,7 +101,6 @@ func writeDockerCompose(settings *configFile) error {
 			dc.Services["caddy"] = &dcService{
 				Image: "caddy:2",
 				Ports: []string{"443:443", "80:80"},
-				Env:   map[string]string{},
 				Volumes: []string{
 					"./tmp/gendc/Caddyfile:/etc/caddy/Caddyfile",
 					"./tmp/gendc:/opt/tls",
@@ -117,14 +117,19 @@ func writeDockerCompose(settings *configFile) error {
 		return errors.Trace(err)
 	}
 	for _, app := range settings.Apps {
+		env := map[string]string{
+			"SSH_AUTH_SOCK": os.Getenv("SSH_AUTH_SOCK"),
+			"LOCAL_RAVENDB": "http://ravendb:8080",
+			"K_SERVICE":     app.Name,
+		}
+		for k, v := range app.Env {
+			env[k] = v
+		}
+
 		dc.Services[app.Name] = &dcService{
 			Image:   "eu.gcr.io/altipla-tools/go:latest",
 			Command: []string{"reloader", "run", ".", "-r", "-e", ".pbtext,.yml,.yaml"},
-			Env: map[string]string{
-				"SSH_AUTH_SOCK": os.Getenv("SSH_AUTH_SOCK"),
-				"LOCAL_RAVENDB": "http://ravendb:8080",
-				"K_SERVICE":     app.Name,
-			},
+			Env:     env,
 			Volumes: []string{
 				os.Getenv("SSH_AUTH_SOCK") + ":" + os.Getenv("SSH_AUTH_SOCK"),
 				".:/workspace",
