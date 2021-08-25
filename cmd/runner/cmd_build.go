@@ -28,13 +28,12 @@ func init() {
 var cmdBuild = &cobra.Command{
 	Use:   "build",
 	Short: "Build a container from a predefined folder structure.",
-	Args:  cobra.MinimumNArgs(1),
+	Args:  cobra.ExactArgs(1),
 	RunE: func(command *cobra.Command, args []string) error {
+		app := args[0]
+
 		if flagBuild.Project == "" {
 			flagBuild.Project = os.Getenv("GOOGLE_PROJECT")
-		}
-		if flagBuild.Source != "" && len(args) > 1 {
-			return errors.Errorf("cannot use --source argument with more than one application")
 		}
 
 		version := time.Now().Format("20060102") + "." + os.Getenv("BUILD_NUMBER")
@@ -42,47 +41,45 @@ var cmdBuild = &cobra.Command{
 			version += ".preview"
 		}
 
-		for _, app := range args {
-			logger := log.WithFields(log.Fields{
-				"name":    app,
-				"version": version,
-			})
+		logger := log.WithFields(log.Fields{
+			"name":    app,
+			"version": version,
+		})
 
-			source := app
-			if flagBuild.Source != "" {
-				source = flagBuild.Source
-			}
+		source := app
+		if flagBuild.Source != "" {
+			source = flagBuild.Source
+		}
 
-			logger.Info("Build app")
-			build := exec.Command(
-				"docker",
-				"build",
-				"--cache-from", "eu.gcr.io/"+flagBuild.Project+"/"+app+":latest",
-				"-f", source+"/Dockerfile",
-				"-t", "eu.gcr.io/"+flagBuild.Project+"/"+app+":latest",
-				"-t", "eu.gcr.io/"+flagBuild.Project+"/"+app+":"+version,
-				".",
-			)
-			build.Stdout = os.Stdout
-			build.Stderr = os.Stderr
-			if err := build.Run(); err != nil {
-				return errors.Trace(err)
-			}
+		logger.Info("Build app")
+		build := exec.Command(
+			"docker",
+			"build",
+			"--cache-from", "eu.gcr.io/"+flagBuild.Project+"/"+app+":latest",
+			"-f", source+"/Dockerfile",
+			"-t", "eu.gcr.io/"+flagBuild.Project+"/"+app+":latest",
+			"-t", "eu.gcr.io/"+flagBuild.Project+"/"+app+":"+version,
+			".",
+		)
+		build.Stdout = os.Stdout
+		build.Stderr = os.Stderr
+		if err := build.Run(); err != nil {
+			return errors.Trace(err)
+		}
 
-			logger.Info("Push to Container Registry")
-			push := exec.Command("docker", "push", "eu.gcr.io/"+flagBuild.Project+"/"+app+":latest")
-			push.Stdout = os.Stdout
-			push.Stderr = os.Stderr
-			if err := push.Run(); err != nil {
-				return errors.Trace(err)
-			}
+		logger.Info("Push to Container Registry")
+		push := exec.Command("docker", "push", "eu.gcr.io/"+flagBuild.Project+"/"+app+":latest")
+		push.Stdout = os.Stdout
+		push.Stderr = os.Stderr
+		if err := push.Run(); err != nil {
+			return errors.Trace(err)
+		}
 
-			push = exec.Command("docker", "push", "eu.gcr.io/"+flagBuild.Project+"/"+app+":"+version)
-			push.Stdout = os.Stdout
-			push.Stderr = os.Stderr
-			if err := push.Run(); err != nil {
-				return errors.Trace(err)
-			}
+		push = exec.Command("docker", "push", "eu.gcr.io/"+flagBuild.Project+"/"+app+":"+version)
+		push.Stdout = os.Stdout
+		push.Stderr = os.Stderr
+		if err := push.Run(); err != nil {
+			return errors.Trace(err)
 		}
 
 		return nil

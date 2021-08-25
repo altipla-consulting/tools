@@ -31,8 +31,10 @@ func init() {
 var cmdPreview = &cobra.Command{
 	Use:   "preview",
 	Short: "Send preview URLs as a comment to Gerrit.",
-	Args:  cobra.MinimumNArgs(1),
+	Args:  cobra.ExactArgs(1),
 	RunE: func(command *cobra.Command, args []string) error {
+		app := args[0]
+
 		if flagPreview.Project == "" {
 			flagPreview.Project = os.Getenv("GOOGLE_PROJECT")
 		}
@@ -48,7 +50,7 @@ var cmdPreview = &cobra.Command{
 		suffixcmd := exec.Command(
 			"gcloud",
 			"run", "services", "describe",
-			args[0],
+			app,
 			"--format", "value(status.url)",
 			"--region", "europe-west1",
 			"--project", flagPreview.Project,
@@ -65,22 +67,20 @@ var cmdPreview = &cobra.Command{
 		parts := strings.Split(strings.Split(u.Host, ".")[0], "-")
 		suffix := parts[len(parts)-2]
 		var previews []string
-		for _, app := range args {
-			previews = append(previews, app+" :: https://"+flagPreview.Tag+"---"+app+"-"+suffix+"-ew.a.run.app/")
-		}
+		previews = append(previews, app+" :: https://"+flagPreview.Tag+"---"+app+"-"+suffix+"-ew.a.run.app/")
 		log.WithField("previews", previews).Debug("Send comment to Gerrit with the previews")
 
 		log.Info("Send preview URLs as a Gerrit comment")
 		gerrit := readGerritInfo()
-		args = []string{
+		ssh := []string{
 			"ssh",
 			"-p", gerrit.Port,
 			fmt.Sprintf("%s@%s", gerrit.BotUsername, gerrit.Host),
 			"gerrit", "review", fmt.Sprintf("%v,%v", gerrit.ChangeNumber, gerrit.PatchSetNumber),
 			"--message", `"Previews deployed at:` + "\n" + strings.Join(previews, "\n") + `"`,
 		}
-		log.Debug(strings.Join(args, " "))
-		comment := exec.Command(args[0], args[1:]...)
+		log.Debug(strings.Join(ssh, " "))
+		comment := exec.Command(ssh[0], ssh[1:]...)
 		comment.Stdout = os.Stdout
 		comment.Stderr = os.Stderr
 		if err := comment.Run(); err != nil {

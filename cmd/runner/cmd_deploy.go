@@ -43,16 +43,18 @@ var cmdDeploy = &cobra.Command{
 	Use:     "deploy",
 	Short:   "Deploy a container to Cloud Run.",
 	Example: "runner deploy foo-folder bar-folder",
-	Args:    cobra.MinimumNArgs(1),
+	Args:    cobra.ExactArgs(1),
 	RunE: func(command *cobra.Command, args []string) error {
+		app := args[0]
+
 		if flagDeploy.Project == "" {
 			flagDeploy.Project = os.Getenv("GOOGLE_PROJECT")
 		}
 		if flagDeploy.Sentry == "" {
 			return errors.Errorf("--sentry flag is required")
 		}
-		if flagDeploy.Name != "" && len(args) > 1 {
-			return errors.Errorf("cannot use --name argument with more than one application")
+		if flagDeploy.ServiceAccount == "" {
+			flagDeploy.ServiceAccount = app
 		}
 
 		client, err := sentry.NewClient(os.Getenv("SENTRY_AUTH_TOKEN"), nil, nil)
@@ -76,81 +78,74 @@ var cmdDeploy = &cobra.Command{
 			}
 		}
 
-		for _, app := range args {
-			serviceAccount := flagDeploy.ServiceAccount
-			if serviceAccount == "" {
-				serviceAccount = app
-			}
+		log.WithFields(log.Fields{
+			"name":            app,
+			"version":         version,
+			"memory":          flagDeploy.Memory,
+			"service-account": flagDeploy.ServiceAccount,
+		}).Info("Deploy app")
 
+		gcloud := []string{
+			"beta", "run", "deploy",
+			app,
+			"--image", "eu.gcr.io/" + flagDeploy.Project + "/" + app + ":" + version,
+			"--region", "europe-west1",
+			"--platform", "managed",
+			"--concurrency", "50",
+			"--timeout", "60s",
+			"--service-account", flagDeploy.ServiceAccount + "@" + flagDeploy.Project + ".iam.gserviceaccount.com",
+			"--memory", flagDeploy.Memory,
+			"--set-env-vars", "SENTRY_DSN=" + keys[0].DSN.Public,
+			"--labels", "app=" + app,
+		}
+		if len(flagDeploy.VolumeSecret) > 0 {
+			var secrets []string
+			for _, secret := range flagDeploy.VolumeSecret {
+				secrets = append(secrets, "/etc/secrets/"+secret+"="+secret+":latest")
+			}
+			for _, secret := range flagDeploy.EnvSecret {
+				varname := strings.Replace(strings.ToUpper(secret), "-", "_", -1)
+				secrets = append(secrets, varname+"="+secret+":latest")
+			}
+			gcloud = append(gcloud, "--set-secrets", strings.Join(secrets, ","))
+		}
+		if flagDeploy.Tag != "" {
+			if os.Getenv("BUILD_CAUSE") == "SCMTRIGGER" {
+				gcloud = append(gcloud, "--no-traffic")
+				gcloud = append(gcloud, "--max-instances", "1")
+			}
+			gcloud = append(gcloud, "--tag", flagDeploy.Tag)
+		} else {
+			gcloud = append(gcloud, "--max-instances", "20")
+		}
+
+		log.Debug(strings.Join(append([]string{"gcloud"}, gcloud...), " "))
+
+		build := exec.Command("gcloud", gcloud...)
+		build.Stdout = os.Stdout
+		build.Stderr = os.Stderr
+		if err := build.Run(); err != nil {
+			return errors.Trace(err)
+		}
+
+		if os.Getenv("BUILD_CAUSE") != "SCMTRIGGER" {
 			log.WithFields(log.Fields{
-				"name":            app,
-				"version":         version,
-				"memory":          flagDeploy.Memory,
-				"service-account": serviceAccount,
-			}).Info("Deploy app")
+				"name":    app,
+				"version": version,
+			}).Info("Enable traffic to latest version of the app")
 
-			gcloud := []string{
-				"beta", "run", "deploy",
+			traffic := exec.Command(
+				"gcloud",
+				"run", "services", "update-traffic",
 				app,
-				"--image", "eu.gcr.io/" + flagDeploy.Project + "/" + app + ":" + version,
+				"--project", flagDeploy.Project,
 				"--region", "europe-west1",
-				"--platform", "managed",
-				"--concurrency", "50",
-				"--timeout", "60s",
-				"--service-account", serviceAccount + "@" + flagDeploy.Project + ".iam.gserviceaccount.com",
-				"--memory", flagDeploy.Memory,
-				"--set-env-vars", "SENTRY_DSN=" + keys[0].DSN.Public,
-				"--labels", "app=" + app,
-			}
-			if len(flagDeploy.VolumeSecret) > 0 {
-				var secrets []string
-				for _, secret := range flagDeploy.VolumeSecret {
-					secrets = append(secrets, "/etc/secrets/"+secret+"="+secret+":latest")
-				}
-				for _, secret := range flagDeploy.EnvSecret {
-					varname := strings.Replace(strings.ToUpper(secret), "-", "_", -1)
-					secrets = append(secrets, varname+"="+secret+":latest")
-				}
-				gcloud = append(gcloud, "--set-secrets", strings.Join(secrets, ","))
-			}
-			if flagDeploy.Tag != "" {
-				if os.Getenv("BUILD_CAUSE") == "SCMTRIGGER" {
-					gcloud = append(gcloud, "--no-traffic")
-					gcloud = append(gcloud, "--max-instances", "1")
-				}
-				gcloud = append(gcloud, "--tag", flagDeploy.Tag)
-			} else {
-				gcloud = append(gcloud, "--max-instances", "20")
-			}
-
-			log.Debug(strings.Join(append([]string{"gcloud"}, gcloud...), " "))
-
-			build := exec.Command("gcloud", gcloud...)
-			build.Stdout = os.Stdout
-			build.Stderr = os.Stderr
-			if err := build.Run(); err != nil {
+				"--to-latest",
+			)
+			traffic.Stdout = os.Stdout
+			traffic.Stderr = os.Stderr
+			if err := traffic.Run(); err != nil {
 				return errors.Trace(err)
-			}
-
-			if os.Getenv("BUILD_CAUSE") != "SCMTRIGGER" {
-				log.WithFields(log.Fields{
-					"name":    app,
-					"version": version,
-				}).Info("Enable traffic to latest version of the app")
-
-				traffic := exec.Command(
-					"gcloud",
-					"run", "services", "update-traffic",
-					app,
-					"--project", flagDeploy.Project,
-					"--region", "europe-west1",
-					"--to-latest",
-				)
-				traffic.Stdout = os.Stdout
-				traffic.Stderr = os.Stderr
-				if err := traffic.Run(); err != nil {
-					return errors.Trace(err)
-				}
 			}
 		}
 
