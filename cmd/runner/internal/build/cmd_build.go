@@ -1,4 +1,4 @@
-package main
+package build
 
 import (
 	"os"
@@ -10,30 +10,29 @@ import (
 	"libs.altipla.consulting/errors"
 )
 
-type buildFlags struct {
+type cmdFlags struct {
 	Project string
 	Source  string
 }
 
 var (
-	flagBuild buildFlags
+	flags cmdFlags
 )
 
 func init() {
-	cmdRoot.AddCommand(cmdBuild)
-	cmdBuild.PersistentFlags().StringVar(&flagBuild.Project, "project", "", "Google Cloud project where the container will be stored. Defaults to the GOOGLE_PROJECT environment variable.")
-	cmdBuild.PersistentFlags().StringVar(&flagBuild.Source, "source", "", "Source folder. Defaults to a folder with the name of the app.")
+	Cmd.PersistentFlags().StringVar(&flags.Project, "project", "", "Google Cloud project where the container will be stored. Defaults to the GOOGLE_PROJECT environment variable.")
+	Cmd.PersistentFlags().StringVar(&flags.Source, "source", "", "Source folder. Defaults to a folder with the name of the app.")
 }
 
-var cmdBuild = &cobra.Command{
+var Cmd = &cobra.Command{
 	Use:   "build",
 	Short: "Build a container from a predefined folder structure.",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(command *cobra.Command, args []string) error {
 		app := args[0]
 
-		if flagBuild.Project == "" {
-			flagBuild.Project = os.Getenv("GOOGLE_PROJECT")
+		if flags.Project == "" {
+			flags.Project = os.Getenv("GOOGLE_PROJECT")
 		}
 
 		version := time.Now().Format("20060102") + "." + os.Getenv("BUILD_NUMBER")
@@ -47,18 +46,18 @@ var cmdBuild = &cobra.Command{
 		})
 
 		source := app
-		if flagBuild.Source != "" {
-			source = flagBuild.Source
+		if flags.Source != "" {
+			source = flags.Source
 		}
 
 		logger.Info("Build app")
 		build := exec.Command(
 			"docker",
 			"build",
-			"--cache-from", "eu.gcr.io/"+flagBuild.Project+"/"+app+":latest",
+			"--cache-from", "eu.gcr.io/"+flags.Project+"/"+app+":latest",
 			"-f", source+"/Dockerfile",
-			"-t", "eu.gcr.io/"+flagBuild.Project+"/"+app+":latest",
-			"-t", "eu.gcr.io/"+flagBuild.Project+"/"+app+":"+version,
+			"-t", "eu.gcr.io/"+flags.Project+"/"+app+":latest",
+			"-t", "eu.gcr.io/"+flags.Project+"/"+app+":"+version,
 			".",
 		)
 		build.Stdout = os.Stdout
@@ -68,14 +67,14 @@ var cmdBuild = &cobra.Command{
 		}
 
 		logger.Info("Push to Container Registry")
-		push := exec.Command("docker", "push", "eu.gcr.io/"+flagBuild.Project+"/"+app+":latest")
+		push := exec.Command("docker", "push", "eu.gcr.io/"+flags.Project+"/"+app+":latest")
 		push.Stdout = os.Stdout
 		push.Stderr = os.Stderr
 		if err := push.Run(); err != nil {
 			return errors.Trace(err)
 		}
 
-		push = exec.Command("docker", "push", "eu.gcr.io/"+flagBuild.Project+"/"+app+":"+version)
+		push = exec.Command("docker", "push", "eu.gcr.io/"+flags.Project+"/"+app+":"+version)
 		push.Stdout = os.Stdout
 		push.Stderr = os.Stderr
 		if err := push.Run(); err != nil {

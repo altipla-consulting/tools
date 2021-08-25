@@ -1,4 +1,4 @@
-package main
+package preview
 
 import (
 	"fmt"
@@ -13,37 +13,36 @@ import (
 	"libs.altipla.consulting/errors"
 )
 
-type previewFlags struct {
+type cmdFlags struct {
 	Project string
 	Tag     string
 }
 
 var (
-	flagPreview previewFlags
+	flags cmdFlags
 )
 
 func init() {
-	cmdRoot.AddCommand(cmdPreview)
-	cmdPreview.PersistentFlags().StringVar(&flagPreview.Project, "project", "", "Google Cloud project where the container will be stored. Defaults to the GOOGLE_PROJECT environment variable.")
-	cmdPreview.PersistentFlags().StringVar(&flagDeploy.Tag, "tag", "", "Name of the revision included in the URL. Defaults to the Gerrit change and patchset.")
+	Cmd.PersistentFlags().StringVar(&flags.Project, "project", "", "Google Cloud project where the container will be stored. Defaults to the GOOGLE_PROJECT environment variable.")
+	Cmd.PersistentFlags().StringVar(&flags.Tag, "tag", "", "Name of the revision included in the URL. Defaults to the Gerrit change and patchset.")
 }
 
-var cmdPreview = &cobra.Command{
+var Cmd = &cobra.Command{
 	Use:   "preview",
 	Short: "Send preview URLs as a comment to Gerrit.",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(command *cobra.Command, args []string) error {
 		app := args[0]
 
-		if flagPreview.Project == "" {
-			flagPreview.Project = os.Getenv("GOOGLE_PROJECT")
+		if flags.Project == "" {
+			flags.Project = os.Getenv("GOOGLE_PROJECT")
 		}
 
 		version := time.Now().Format("20060102") + "." + os.Getenv("BUILD_NUMBER")
 		if os.Getenv("BUILD_CAUSE") == "SCMTRIGGER" {
 			version += ".preview"
-			if flagPreview.Tag == "" {
-				flagPreview.Tag = "preview-" + os.Getenv("GERRIT_CHANGE_NUMBER") + "-" + os.Getenv("GERRIT_PATCHSET_NUMBER")
+			if flags.Tag == "" {
+				flags.Tag = "preview-" + os.Getenv("GERRIT_CHANGE_NUMBER") + "-" + os.Getenv("GERRIT_PATCHSET_NUMBER")
 			}
 		}
 
@@ -53,7 +52,7 @@ var cmdPreview = &cobra.Command{
 			app,
 			"--format", "value(status.url)",
 			"--region", "europe-west1",
-			"--project", flagPreview.Project,
+			"--project", flags.Project,
 		)
 		output, err := suffixcmd.CombinedOutput()
 		if err != nil {
@@ -67,7 +66,7 @@ var cmdPreview = &cobra.Command{
 		parts := strings.Split(strings.Split(u.Host, ".")[0], "-")
 		suffix := parts[len(parts)-2]
 		var previews []string
-		previews = append(previews, app+" :: https://"+flagPreview.Tag+"---"+app+"-"+suffix+"-ew.a.run.app/")
+		previews = append(previews, app+" :: https://"+flags.Tag+"---"+app+"-"+suffix+"-ew.a.run.app/")
 		log.WithField("previews", previews).Debug("Send comment to Gerrit with the previews")
 
 		log.Info("Send preview URLs as a Gerrit comment")
