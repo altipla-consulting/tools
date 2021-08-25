@@ -6,6 +6,7 @@ import (
 
 	"tools.altipla.consulting/cmd/wave/internal/build"
 	"tools.altipla.consulting/cmd/wave/internal/deploy"
+	"tools.altipla.consulting/cmd/wave/internal/netlify"
 	"tools.altipla.consulting/cmd/wave/internal/preview"
 )
 
@@ -15,6 +16,7 @@ func init() {
 	cmdRoot.PersistentFlags().BoolVarP(&flagDebug, "debug", "d", false, "Enable debug logging for this tool")
 	cmdRoot.AddCommand(build.Cmd)
 	cmdRoot.AddCommand(deploy.Cmd)
+	cmdRoot.AddCommand(netlify.Cmd)
 	cmdRoot.AddCommand(preview.Cmd)
 }
 
