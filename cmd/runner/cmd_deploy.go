@@ -20,6 +20,7 @@ type deployFlags struct {
 	VolumeSecret   []string
 	EnvSecret      []string
 	Tag            string
+	Name           string
 }
 
 var (
@@ -35,18 +36,23 @@ func init() {
 	cmdDeploy.PersistentFlags().StringSliceVar(&flagDeploy.VolumeSecret, "volume-secret", nil, "Secrets to mount as volumes.")
 	cmdDeploy.PersistentFlags().StringSliceVar(&flagDeploy.EnvSecret, "env-secret", nil, "Secrets to mount as environment variables.")
 	cmdDeploy.PersistentFlags().StringVar(&flagDeploy.Tag, "tag", "", "Name of the revision included in the URL. Defaults to the Gerrit change and patchset.")
+	cmdDeploy.PersistentFlags().StringVar(&flagDeploy.Name, "name", "", "Name of the application that will be deployed. Defaults to the folder name.")
 }
 
 var cmdDeploy = &cobra.Command{
-	Use:   "deploy",
-	Short: "Deploy a container to Cloud Run.",
-	Args:  cobra.MinimumNArgs(1),
+	Use:     "deploy",
+	Short:   "Deploy a container to Cloud Run.",
+	Example: "runner deploy foo-folder bar-folder",
+	Args:    cobra.MinimumNArgs(1),
 	RunE: func(command *cobra.Command, args []string) error {
 		if flagDeploy.Project == "" {
 			flagDeploy.Project = os.Getenv("GOOGLE_PROJECT")
 		}
 		if flagDeploy.Sentry == "" {
 			return errors.Errorf("--sentry flag is required")
+		}
+		if flagDeploy.Name != "" && len(args) > 1 {
+			return errors.Errorf("cannot use --name argument with more than one application")
 		}
 
 		client, err := sentry.NewClient(os.Getenv("SENTRY_AUTH_TOKEN"), nil, nil)

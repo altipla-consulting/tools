@@ -12,6 +12,7 @@ import (
 
 type buildFlags struct {
 	Project string
+	Source  string
 }
 
 var (
@@ -21,6 +22,7 @@ var (
 func init() {
 	cmdRoot.AddCommand(cmdBuild)
 	cmdBuild.PersistentFlags().StringVar(&flagBuild.Project, "project", "", "Google Cloud project where the container will be stored. Defaults to the GOOGLE_PROJECT environment variable.")
+	cmdBuild.PersistentFlags().StringVar(&flagBuild.Source, "source", "", "Source folder. Defaults to a folder with the name of the app.")
 }
 
 var cmdBuild = &cobra.Command{
@@ -30,6 +32,9 @@ var cmdBuild = &cobra.Command{
 	RunE: func(command *cobra.Command, args []string) error {
 		if flagBuild.Project == "" {
 			flagBuild.Project = os.Getenv("GOOGLE_PROJECT")
+		}
+		if flagBuild.Source != "" && len(args) > 1 {
+			return errors.Errorf("cannot use --source argument with more than one application")
 		}
 
 		version := time.Now().Format("20060102") + "." + os.Getenv("BUILD_NUMBER")
@@ -43,12 +48,17 @@ var cmdBuild = &cobra.Command{
 				"version": version,
 			})
 
+			source := app
+			if flagBuild.Source != "" {
+				source = flagBuild.Source
+			}
+
 			logger.Info("Build app")
 			build := exec.Command(
 				"docker",
 				"build",
 				"--cache-from", "eu.gcr.io/"+flagBuild.Project+"/"+app+":latest",
-				"-f", app+"/Dockerfile",
+				"-f", source+"/Dockerfile",
 				"-t", "eu.gcr.io/"+flagBuild.Project+"/"+app+":latest",
 				"-t", "eu.gcr.io/"+flagBuild.Project+"/"+app+":"+version,
 				".",

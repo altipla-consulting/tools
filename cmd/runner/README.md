@@ -46,14 +46,3 @@ You can deploy multiple containers at the same time:
 ```shell
 runner deploy foo bar baz --project $GOOGLE_PROJECT --sentry foo-name
 ```
-
-### Extra configuration
-
-There are multiple flags to customize deployments:
-
-| Flag | Default | Description |
-| ---- | ------- | ----------- |
-| `--project` | `GOOGLE_PROJECT` env variable | Google Cloud project name. |
-| `--sentry` | &mdash; | REQUIRED. Sentry project name. |
-| `--memory` | `256Mi` | Memory available inside the Cloud Run application. |
-| `--service-account` | (name of the app) | Service account inside the project to authorize the application. |
