@@ -20,7 +20,6 @@ type cmdFlags struct {
 	VolumeSecret   []string
 	EnvSecret      []string
 	Tag            string
-	Name           string
 }
 
 var (
@@ -35,7 +34,6 @@ func init() {
 	Cmd.PersistentFlags().StringSliceVar(&flags.VolumeSecret, "volume-secret", nil, "Secrets to mount as volumes.")
 	Cmd.PersistentFlags().StringSliceVar(&flags.EnvSecret, "env-secret", nil, "Secrets to mount as environment variables.")
 	Cmd.PersistentFlags().StringVar(&flags.Tag, "tag", "", "Name of the revision included in the URL. Defaults to the Gerrit change and patchset.")
-	Cmd.PersistentFlags().StringVar(&flags.Name, "name", "", "Name of the application that will be deployed. Defaults to the folder name.")
 }
 
 var Cmd = &cobra.Command{
