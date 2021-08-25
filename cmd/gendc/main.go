@@ -30,6 +30,7 @@ type configApp struct {
 	Name      string            `hcl:"name,label"`
 	DependsOn []string          `hcl:"depends_on,optional"`
 	Env       map[string]string `hcl:"env,optional"`
+	Source    string            `hcl:"source,optional"`
 }
 
 func run() error {
@@ -126,6 +127,10 @@ func writeDockerCompose(settings *configFile) error {
 			env[k] = v
 		}
 
+		if app.Source == "" {
+			app.Source = app.Name
+		}
+
 		dc.Services[app.Name] = &dcService{
 			Image:   "eu.gcr.io/altipla-tools/go:latest",
 			Command: []string{"reloader", "run", ".", "-r", "-e", ".pbtext,.yml,.yaml", "-w", "../pkg", "-w", "../internal", "-w", "../protos"},
@@ -140,7 +145,7 @@ func writeDockerCompose(settings *configFile) error {
 				home + "/.kube:/home/container/.kube",
 			},
 			User:       os.Getenv("USR_ID") + ":" + os.Getenv("GRP_ID"),
-			WorkingDir: "/workspace/" + app.Name,
+			WorkingDir: "/workspace/" + app.Source,
 			DependsOn:  app.DependsOn,
 		}
 	}
