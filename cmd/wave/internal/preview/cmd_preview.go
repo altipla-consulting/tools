@@ -34,7 +34,7 @@ func init() {
 var Cmd = &cobra.Command{
 	Use:     "preview",
 	Short:   "Send preview URLs as a comment to Gerrit.",
-	Example: "wave preview --cloud-run my-app:my-app",
+	Example: "wave preview --cloud-run my-app",
 	RunE: func(command *cobra.Command, args []string) error {
 		if flags.Project == "" {
 			flags.Project = os.Getenv("GOOGLE_PROJECT")
@@ -135,9 +135,12 @@ func readGerritInfo() gerritInfo {
 }
 
 func splitName(name string) (string, string, error) {
-	parts := strings.Split(name, ":")
-	if len(parts) != 2 {
+	switch parts := strings.Split(name, ":"); len(parts) {
+	case 1:
+		return parts[0], parts[0], nil
+	case 2:
+		return parts[0], parts[1], nil
+	default:
 		return "", "", errors.Errorf("application name has wrong format: %s", name)
 	}
-	return parts[0], parts[1], nil
 }
