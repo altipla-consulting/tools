@@ -41,7 +41,7 @@ func init() {
 var Cmd = &cobra.Command{
 	Use:     "deploy",
 	Short:   "Deploy a container to Cloud Run.",
-	Example: "runner deploy foo-folder bar-folder",
+	Example: "wave deploy foo",
 	Args:    cobra.ExactArgs(1),
 	RunE: func(command *cobra.Command, args []string) error {
 		app := args[0]

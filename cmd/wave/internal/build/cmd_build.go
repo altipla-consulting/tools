@@ -25,9 +25,10 @@ func init() {
 }
 
 var Cmd = &cobra.Command{
-	Use:   "build",
-	Short: "Build a container from a predefined folder structure.",
-	Args:  cobra.ExactArgs(1),
+	Use:     "build",
+	Short:   "Build a container from a predefined folder structure.",
+	Example: "wave build foo",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(command *cobra.Command, args []string) error {
 		app := args[0]
 

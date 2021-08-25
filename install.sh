@@ -13,7 +13,7 @@ TOOLS=(
   previewer-netlify
   pub
   reloader
-  runner
+  wave
 )
 for app in "${TOOLS[@]}"
 do

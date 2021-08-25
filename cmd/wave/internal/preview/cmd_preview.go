@@ -32,8 +32,9 @@ func init() {
 }
 
 var Cmd = &cobra.Command{
-	Use:   "preview",
-	Short: "Send preview URLs as a comment to Gerrit.",
+	Use:     "preview",
+	Short:   "Send preview URLs as a comment to Gerrit.",
+	Example: "wave preview --cloud-run my-app:my-app",
 	RunE: func(command *cobra.Command, args []string) error {
 		if flags.Project == "" {
 			flags.Project = os.Getenv("GOOGLE_PROJECT")

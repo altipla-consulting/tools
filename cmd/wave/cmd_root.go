@@ -4,9 +4,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	"tools.altipla.consulting/cmd/runner/internal/build"
-	"tools.altipla.consulting/cmd/runner/internal/deploy"
-	"tools.altipla.consulting/cmd/runner/internal/preview"
+	"tools.altipla.consulting/cmd/wave/internal/build"
+	"tools.altipla.consulting/cmd/wave/internal/deploy"
+	"tools.altipla.consulting/cmd/wave/internal/preview"
 )
 
 var flagDebug bool
@@ -19,8 +19,8 @@ func init() {
 }
 
 var cmdRoot = &cobra.Command{
-	Use:          "runner",
-	Short:        "Publish Cloud Run applications.",
+	Use:          "wave",
+	Short:        "Build and publish applications.",
 	SilenceUsage: true,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		log.SetFormatter(new(log.TextFormatter))
