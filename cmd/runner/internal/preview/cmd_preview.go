@@ -14,8 +14,10 @@ import (
 )
 
 type cmdFlags struct {
-	Project string
-	Tag     string
+	Project  string
+	Tag      string
+	CloudRun []string
+	Netlify  []string
 }
 
 var (
@@ -25,17 +27,20 @@ var (
 func init() {
 	Cmd.PersistentFlags().StringVar(&flags.Project, "project", "", "Google Cloud project where the container will be stored. Defaults to the GOOGLE_PROJECT environment variable.")
 	Cmd.PersistentFlags().StringVar(&flags.Tag, "tag", "", "Name of the revision included in the URL. Defaults to the Gerrit change and patchset.")
+	Cmd.PersistentFlags().StringSliceVar(&flags.CloudRun, "cloud-run", nil, "Cloud Run applications. Format: `local-name:cloud-run-name`.")
+	Cmd.PersistentFlags().StringSliceVar(&flags.Netlify, "netlify", nil, "Netlify applications. Format: `local-name:netlify-name`.")
 }
 
 var Cmd = &cobra.Command{
 	Use:   "preview",
 	Short: "Send preview URLs as a comment to Gerrit.",
-	Args:  cobra.ExactArgs(1),
 	RunE: func(command *cobra.Command, args []string) error {
-		app := args[0]
-
 		if flags.Project == "" {
 			flags.Project = os.Getenv("GOOGLE_PROJECT")
+		}
+
+		if len(flags.CloudRun) == 0 && len(flags.Netlify) == 0 {
+			return errors.Errorf("pass --cloud-run or --netlify applications as arguments")
 		}
 
 		version := time.Now().Format("20060102") + "." + os.Getenv("BUILD_NUMBER")
@@ -46,30 +51,50 @@ var Cmd = &cobra.Command{
 			}
 		}
 
-		suffixcmd := exec.Command(
-			"gcloud",
-			"run", "services", "describe",
-			app,
-			"--format", "value(status.url)",
-			"--region", "europe-west1",
-			"--project", flags.Project,
-		)
-		output, err := suffixcmd.CombinedOutput()
-		if err != nil {
-			log.Error(string(output))
-			return errors.Trace(err)
+		var suffix string
+		if len(flags.CloudRun) > 0 {
+			suffixcmd := exec.Command(
+				"gcloud",
+				"run", "services", "describe",
+				flags.CloudRun[0],
+				"--format", "value(status.url)",
+				"--region", "europe-west1",
+				"--project", flags.Project,
+			)
+			output, err := suffixcmd.CombinedOutput()
+			if err != nil {
+				log.Error(string(output))
+				return errors.Trace(err)
+			}
+			u, err := url.Parse(strings.TrimSpace(string(output)))
+			if err != nil {
+				return errors.Trace(err)
+			}
+			parts := strings.Split(strings.Split(u.Host, ".")[0], "-")
+			suffix = parts[len(parts)-2]
 		}
-		u, err := url.Parse(strings.TrimSpace(string(output)))
-		if err != nil {
-			return errors.Trace(err)
-		}
-		parts := strings.Split(strings.Split(u.Host, ".")[0], "-")
-		suffix := parts[len(parts)-2]
+
 		var previews []string
-		previews = append(previews, app+" :: https://"+flags.Tag+"---"+app+"-"+suffix+"-ew.a.run.app/")
-		log.WithField("previews", previews).Debug("Send comment to Gerrit with the previews")
+		for _, cr := range flags.CloudRun {
+			local, remote, err := splitName(cr)
+			if err != nil {
+				return errors.Trace(err)
+			}
+			previews = append(previews, local+" :: https://"+flags.Tag+"---"+remote+"-"+suffix+"-ew.a.run.app/")
+		}
+		for _, netlify := range flags.Netlify {
+			local, remote, err := splitName(netlify)
+			if err != nil {
+				return errors.Trace(err)
+			}
+			previews = append(previews, local+" :: https://"+flags.Tag+"--"+remote+".netlify.app/")
+		}
 
 		log.Info("Send preview URLs as a Gerrit comment")
+		for _, preview := range previews {
+			log.Println(preview)
+		}
+
 		gerrit := readGerritInfo()
 		ssh := []string{
 			"ssh",
@@ -106,4 +131,12 @@ func readGerritInfo() gerritInfo {
 		ChangeNumber:   os.Getenv("GERRIT_CHANGE_NUMBER"),
 		PatchSetNumber: os.Getenv("GERRIT_PATCHSET_NUMBER"),
 	}
+}
+
+func splitName(name string) (string, string, error) {
+	parts := strings.Split(name, ":")
+	if len(parts) != 2 {
+		return "", "", errors.Errorf("application name has wrong format: %s", name)
+	}
+	return parts[0], parts[1], nil
 }
