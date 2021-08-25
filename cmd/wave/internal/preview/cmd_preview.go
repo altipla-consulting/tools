@@ -54,10 +54,14 @@ var Cmd = &cobra.Command{
 
 		var suffix string
 		if len(flags.CloudRun) > 0 {
+			_, remote, err := splitName(flags.CloudRun[0])
+			if err != nil {
+				return errors.Trace(err)
+			}
 			suffixcmd := exec.Command(
 				"gcloud",
 				"run", "services", "describe",
-				flags.CloudRun[0],
+				remote,
 				"--format", "value(status.url)",
 				"--region", "europe-west1",
 				"--project", flags.Project,
