@@ -10,11 +10,12 @@ var flagDebug bool
 func init() {
 	CmdRoot.PersistentFlags().BoolVarP(&flagDebug, "debug", "d", false, "Activa el logging de depuración")
 
-	CmdRoot.AddCommand(CmdCheckout)
-	CmdRoot.AddCommand(CmdCheckoutShort)
-	CmdRoot.AddCommand(CmdLogin)
-	CmdRoot.AddCommand(CmdPush)
-	CmdRoot.AddCommand(CmdUpdate)
+	CmdRoot.AddCommand(cmdCheckout)
+	CmdRoot.AddCommand(cmdCheckoutShort)
+	CmdRoot.AddCommand(cmdLogin)
+	CmdRoot.AddCommand(cmdPush)
+	CmdRoot.AddCommand(cmdUpdate)
+	CmdRoot.AddCommand(cmdPR)
 }
 
 var CmdRoot = &cobra.Command{

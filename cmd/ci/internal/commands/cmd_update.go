@@ -14,10 +14,10 @@ import (
 var flagForce bool
 
 func init() {
-	CmdUpdate.Flags().BoolVarP(&flagForce, "force", "f", false, "Fuerza la actualización aunque haya cambios pendientes. WARNING: Es una operación destructiva.")
+	cmdUpdate.Flags().BoolVarP(&flagForce, "force", "f", false, "Fuerza la actualización aunque haya cambios pendientes. WARNING: Es una operación destructiva.")
 }
 
-var CmdUpdate = &cobra.Command{
+var cmdUpdate = &cobra.Command{
 	Use:   "update",
 	Short: "Actualiza a la última versión de master borrando todo lo que haya en local",
 	RunE: func(cmd *cobra.Command, args []string) error {

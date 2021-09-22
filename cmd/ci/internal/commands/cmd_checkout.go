@@ -13,10 +13,11 @@ import (
 	"tools.altipla.consulting/cmd/ci/internal/run"
 )
 
-var CmdCheckout = &cobra.Command{
-	Use:   "checkout",
-	Short: "Establece el código a la versión exacta de un Pull Request en GitHub",
-	Args:  cobra.ExactArgs(1),
+var cmdCheckout = &cobra.Command{
+	Use:     "checkout",
+	Short:   "Establece el código a la versión exacta de un Pull Request en GitHub",
+	Example: "ci checkout 123",
+	Args:    cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := context.Background()
 
@@ -51,9 +52,10 @@ var CmdCheckout = &cobra.Command{
 	},
 }
 
-var CmdCheckoutShort = &cobra.Command{
-	Use:   "co",
-	Short: CmdCheckout.Short,
-	Args:  CmdCheckout.Args,
-	RunE:  CmdCheckout.RunE,
+var cmdCheckoutShort = &cobra.Command{
+	Use:     "co",
+	Short:   cmdCheckout.Short,
+	Example: "ci co 123",
+	Args:    cmdCheckout.Args,
+	RunE:    cmdCheckout.RunE,
 }
