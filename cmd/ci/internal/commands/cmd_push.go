@@ -28,18 +28,18 @@ var CmdPush = &cobra.Command{
 		if err != nil {
 			return errors.Trace(err)
 		}
+		mainBranch, err := query.MainBranch()
+		if err != nil {
+			return errors.Trace(err)
+		}
 
 		if gerrit {
-			if err := run.Git("push", "origin", "HEAD:refs/for/master"); err != nil {
+			if err := run.Git("push", "origin", "HEAD:refs/for/"+mainBranch); err != nil {
 				return errors.Trace(err)
 			}
 			return nil
 		}
 
-		mainBranch, err := query.MainBranch()
-		if err != nil {
-			return errors.Trace(err)
-		}
 		branch, err := query.CurrentBranch()
 		if err != nil {
 			return errors.Trace(err)
