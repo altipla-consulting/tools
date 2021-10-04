@@ -199,22 +199,8 @@ func writeCaddyfile(settings *configFile) error {
 	log.Println("Generating Caddyfile configuration")
 
 	var buf bytes.Buffer
-	fmt.Fprintln(&buf)
-
-	for _, app := range settings.Apps {
-		fmt.Fprintf(&buf, "%s.dev.localhost {\n", app.Name)
-		fmt.Fprintf(&buf, "\treverse_proxy %s:8080\n", app.Name)
-		fmt.Fprintln(&buf, "\ttls /opt/tls/cert.pem /opt/tls/key.pem")
-		fmt.Fprintln(&buf, "}")
-		fmt.Fprintln(&buf)
-	}
-
-	for _, js := range settings.JS {
-		fmt.Fprintf(&buf, "%s.dev.localhost {\n", js.Name)
-		fmt.Fprintf(&buf, "\treverse_proxy %s:3000\n", js.Name)
-		fmt.Fprintln(&buf, "\ttls /opt/tls/cert.pem /opt/tls/key.pem")
-		fmt.Fprintln(&buf, "}")
-		fmt.Fprintln(&buf)
+	if err := tmplCaddyfile.Execute(&buf, settings); err != nil {
+		return errors.Trace(err)
 	}
 
 	if err := ioutil.WriteFile("tmp/gendc/Caddyfile", buf.Bytes(), 0600); err != nil {
