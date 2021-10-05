@@ -21,5 +21,8 @@ do
   echo "----------"
   curl https://tools.altipla.consulting/tools/$app > /usr/local/bin/$app
   chmod +x /usr/local/bin/$app
+
+  # Delete old app install locations.
+  rm -f ~/bin/$app
   echo "----------"
 done
