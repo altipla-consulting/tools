@@ -3,6 +3,11 @@ package main
 import "html/template"
 
 var tmplCaddyfile = template.Must(template.New("caddyfile").Parse(`
+{
+	local_certs
+	skip_install_trust
+}
+
 {{range .Apps}}
 {{.Name}}.dev.localhost {
 	@grpc protocol grpc
