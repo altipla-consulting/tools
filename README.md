@@ -7,7 +7,7 @@ Herramientas internas para desarrolladores de Altipla.
 ## Instalación
 
 ```shell
-curl https://tools.altipla.consulting/install/tools | bash
+curl https://tools.altipla.consulting/install/tools | sudo bash
 ```
 
 ## Herramientas

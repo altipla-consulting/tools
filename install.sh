@@ -2,8 +2,6 @@
 
 set -eu
 
-mkdir -p ~/bin
-
 TOOLS=(
   ci
   gendc
@@ -21,7 +19,7 @@ do
   echo "----------"
   echo " [*] downloading $app"
   echo "----------"
-  curl https://tools.altipla.consulting/tools/$app > ~/bin/$app
-  chmod +x ~/bin/$app
+  curl https://tools.altipla.consulting/tools/$app > /usr/local/bin/$app
+  chmod +x /usr/local/bin/$app
   echo "----------"
 done
