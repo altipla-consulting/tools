@@ -32,6 +32,7 @@ type configApp struct {
 	DependsOn []string          `hcl:"depends_on,optional"`
 	Env       map[string]string `hcl:"env,optional"`
 	Source    string            `hcl:"source,optional"`
+	Domains   []string          `hcl:"domains,optional"`
 }
 
 type configJS struct {
@@ -45,10 +46,15 @@ func run() error {
 		return errors.Trace(err)
 	}
 
+	for _, app := range settings.Apps {
+		if len(app.Domains) == 0 {
+			app.Domains = []string{app.Name}
+		}
+	}
+
 	if err := os.MkdirAll("tmp/gendc", 0700); err != nil {
 		return errors.Trace(err)
 	}
-
 	if err := createCerts(); err != nil {
 		return errors.Trace(err)
 	}
