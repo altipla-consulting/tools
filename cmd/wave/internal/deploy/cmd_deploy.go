@@ -99,7 +99,7 @@ var Cmd = &cobra.Command{
 			"--set-env-vars", "SENTRY_DSN=" + keys[0].DSN.Public,
 			"--labels", "app=" + app,
 		}
-		if len(flags.VolumeSecret) > 0 {
+		if len(flags.VolumeSecret) > 0 || len(flags.EnvSecret) > 0 {
 			var secrets []string
 			for _, secret := range flags.VolumeSecret {
 				secrets = append(secrets, "/etc/secrets/"+secret+"="+secret+":latest")
