@@ -16,17 +16,17 @@ There are multiple tools inside this repo with different levels of activity and 
 
 | Tool | State | Support | Docs |
 |------|-------|---------|------|
-| `ci` | Actively used | Supported | |
-| `gaestage` | Actively used | Supported | |
-| `gendc` | Actively used | Unsupported.<br>Very opinionated | |
-| `impsort` | Actively used | Supported | |
-| `jnet` | Actively used | Supported | |
+| `ci` | Actively used | Supported | [Docs](./ci/README.md) |
+| `gaestage` | Actively used | Supported | [Docs](./gaestage/README.md) |
+| `gendc` | Actively used | Unsupported.<br>Very opinionated | [Docs](./gendc/README.md) |
+| `impsort` | Actively used | Supported | [Docs](./impsort/README.md) |
+| `jnet` | Actively used | Supported | [Docs](./jnet/README.md) |
 | `linter` | Actively used | Unsupported.<br>Very opinionated | |
-| `previewer-netlify` | Deprecated.<br>Use `wave` instead. | Unsupported | |
-| `pub` | Deprecated.<br>Use `wave` instead. | Unsupported | |
-| `reloader` | Actively used | Supported | |
-| `runner` | Deprecated.<br>Use `wave` instead. | Unsupported | |
-| `wave` | Actively used. | Unsupported | |
+| `previewer-netlify` | Deprecated.<br>Use `wave` instead. | Unsupported | [Docs](./previewer/README.md) |
+| `pub` | Deprecated.<br>Use `wave` instead. | Unsupported | [Docs](./pub/README.md) |
+| `reloader` | Actively used | Supported | [Docs](./reloader/README.md) |
+| `runner` | Deprecated.<br>Use `wave` instead. | Unsupported | [Docs](./runner/README.md) |
+| `wave` | Actively used. | Unsupported | [Docs](./wave/README.md) |
 
 
 ## Contributing

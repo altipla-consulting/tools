@@ -4,7 +4,7 @@
 Jsonnet custom interpreter
 
 
-## Uso
+## Usage
 
 ```shell
 jnet k8s/file.jsonnet
