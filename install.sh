@@ -4,6 +4,7 @@ set -eu
 
 TOOLS=(
   ci
+  gaestage
   gendc
   impsort
   jnet

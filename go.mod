@@ -11,6 +11,7 @@ require (
 	github.com/kyokomi/emoji/v2 v2.2.8
 	github.com/mgechev/dots v0.0.0-20190921121421-c36f7dcfbb81
 	github.com/mgechev/revive v1.0.7
+	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06
 	github.com/segmentio/ksuid v1.0.3
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.1.3
