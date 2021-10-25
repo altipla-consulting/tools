@@ -6,9 +6,18 @@ Internal tools for developers in Altipla Consulting.
 
 ## Install
 
+Install all tools in one go:
+
 ```shell
-curl https://tools.altipla.consulting/install/tools | sudo bash
+curl https://raw.githubusercontent.com/altipla-consulting/tools/master/install/all.sh | sudo bash
 ```
+
+Install only one of the tools:
+
+```shell
+curl https://raw.githubusercontent.com/altipla-consulting/tools/master/install/jnet.sh | sudo bash
+```
+
 
 ## Tools
 
