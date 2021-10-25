@@ -1,0 +1,22 @@
+{
+  "name": "@altipla/release",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Internal tools for developers in Altipla Consulting.",
+  "scripts": {
+    "test": ""
+  },
+  "files": [
+    "package.json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/altipla-consulting/tools.git"
+  },
+  "author": "Altipla Consulting",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/altipla-consulting/tools/issues"
+  },
+  "homepage": "https://github.com/altipla-consulting/tools#readme"
+}
