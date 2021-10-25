@@ -8,67 +8,79 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - name: Checkout code
+      uses: actions/checkout@master
 
-    - uses: actions/setup-go@v2
+    - name: Configure Go
+      uses: actions/setup-go@v2
       with:
         go-version: 1.14.7
 
-    - uses: altipla-consulting/go-release.actions@main
+    - name: Release ci
+      uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/ci
         name: ci
 
-    - uses: altipla-consulting/go-release.actions@main
+    - name: Release gaestage
+      uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/gaestage
         name: gaestage
 
-    - uses: altipla-consulting/go-release.actions@main
+    - name: Release gendc
+      uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/gendc
         name: gendc
 
-    - uses: altipla-consulting/go-release.actions@main
+    - name: Release impsort
+      uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/impsort
         name: impsort
 
-    - uses: altipla-consulting/go-release.actions@main
+    - name: Release jnet
+      uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/jnet
         name: jnet
 
-    - uses: altipla-consulting/go-release.actions@main
+    - name: Release linter
+      uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/linter
         name: linter
 
-    - uses: altipla-consulting/go-release.actions@main
+    - name: Release previewer-netlify
+      uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/previewer-netlify
         name: previewer-netlify
 
-    - uses: altipla-consulting/go-release.actions@main
+    - name: Release pub
+      uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/pub
         name: pub
 
-    - uses: altipla-consulting/go-release.actions@main
+    - name: Release reloader
+      uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/reloader
         name: reloader
 
-    - uses: altipla-consulting/go-release.actions@main
+    - name: Release wave
+      uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/wave
