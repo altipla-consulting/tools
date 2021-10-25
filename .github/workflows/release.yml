@@ -14,7 +14,7 @@ jobs:
       with:
         go-version: 1.14.7
 
-    - uses: altipla-consulting/go-release-1.14.actions@master
+    - uses: altipla-consulting/go-release-1.14.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/ci
