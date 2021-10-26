@@ -32,8 +32,5 @@ do
   curl -L https://github.com/altipla-consulting/tools/releases/download/${LATEST_VERSION}/${app}_${LATEST_VERSION}_linux_amd64 > /usr/local/bin/$app
   chmod +x /usr/local/bin/$app
 
-  # Delete old app install locations.
-  rm -f ~/bin/$app
-
   echo "----------"
 done
