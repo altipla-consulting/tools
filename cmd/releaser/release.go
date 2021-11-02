@@ -138,6 +138,13 @@ func Release(update string) error {
 				Message: "Release new version",
 				Tasks: []*tasks.Task{
 					{
+						Message: "Commit new tag",
+						Handler: func(w io.Writer) error {
+							_, err := run.GitCapture(w, "commit", "--allow-empty", "-m", release[1:])
+							return errors.Trace(err)
+						},
+					},
+					{
 						Message: "Tag repo",
 						Handler: func(w io.Writer) error {
 							_, err := run.GitCapture(w, "tag", "-a", release, "-m", release[1:])
@@ -214,7 +221,7 @@ func releaseNotes(repo, release string) (string, error) {
 	}
 
 	var body []string
-	for _, line := range strings.Split(commitlog, "\n") {
+	for _, line := range strings.Split(commitlog, "\n")[1:] {
 		index := strings.LastIndex(line, " ")
 		body = append(body, "- "+line[:index]+"  "+line[index+1:])
 	}
