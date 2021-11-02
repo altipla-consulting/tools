@@ -140,7 +140,6 @@ func Release(update string) error {
 				},
 			},
 			&tasks.Task{
-				Disable: true,
 				Message: "Create release draft on GitHub",
 				Handler: func(w io.Writer) error {
 					remote, err := git.RemoteURL("origin")
