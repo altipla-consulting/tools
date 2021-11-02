@@ -26,6 +26,7 @@ func GitCapture(w io.Writer, args ...string) (string, error) {
 	cmd.Stdout = out
 	cmd.Stderr = out
 	if err := cmd.Run(); err != nil {
+		log.Debugf("OUTPUT:\n%s", buf.String())
 		return "", errors.Trace(err)
 	}
 
