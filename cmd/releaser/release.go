@@ -138,16 +138,10 @@ func Release(update string) error {
 				Message: "Release new version",
 				Tasks: []*tasks.Task{
 					{
-						Message: "Commit new tag",
-						Handler: func(w io.Writer) error {
-							_, err := run.GitCapture(w, "commit", "--allow-empty", "-m", release[1:])
-							return errors.Trace(err)
-						},
-					},
-					{
 						Message: "Tag repo",
 						Handler: func(w io.Writer) error {
-							return errors.Trace(git.Tag(release))
+							_, err := run.GitCapture(w, "tag", "-a", release, "-m", release[1:])
+							return errors.Trace(err)
 						},
 					},
 					{

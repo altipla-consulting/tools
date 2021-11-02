@@ -1,7 +1,6 @@
 package git
 
 import (
-	"log"
 	"os/exec"
 	"sort"
 	"strings"
@@ -69,10 +68,7 @@ func PreviousTag() (string, error) {
 		return "", nil
 	}
 
-	log.Println(tags)
-
 	sort.Sort(sort.Reverse(semver.ByVersion(tags)))
-	log.Println(tags)
 	return tags[1], nil
 }
 
@@ -90,11 +86,6 @@ func RemoteHistoryClean() (bool, error) {
 		return false, errors.Trace(err)
 	}
 	return history == "" || history == "0", nil
-}
-
-func Tag(tag string) error {
-	_, err := run.Git("tag", tag)
-	return errors.Trace(err)
 }
 
 func RemoteURL(name string) (string, error) {
