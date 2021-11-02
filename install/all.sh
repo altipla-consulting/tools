@@ -20,6 +20,7 @@ TOOLS=(
   linter
   previewer-netlify
   pub
+  releaser
   reloader
   wave
 )
