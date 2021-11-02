@@ -112,6 +112,25 @@ func Release(update string) error {
 							return nil
 						},
 					},
+					{
+						Message: "Check git tag existence",
+						Handler: func(w io.Writer) error {
+							_, err := run.GitCapture(w, "fetch")
+							if err != nil {
+								return errors.Trace(err)
+							}
+
+							exists, err := git.RemoteTagExists(release)
+							if err != nil {
+								return errors.Trace(err)
+							}
+							if exists {
+								return errors.Errorf("Git tag %s already exists.", release)
+							}
+
+							return nil
+						},
+					},
 				},
 			},
 			&tasks.ParentTask{

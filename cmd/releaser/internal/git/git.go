@@ -1,6 +1,7 @@
 package git
 
 import (
+	"os/exec"
 	"sort"
 	"strings"
 
@@ -114,4 +115,18 @@ func CommitLogFrom(from string) (string, error) {
 		return "", errors.Trace(err)
 	}
 	return commitlog, nil
+}
+
+func RemoteTagExists(name string) (bool, error) {
+	_, err := run.Git("rev-parse", "--quiet", "--verify", "refs/tags/"+name)
+	if err != nil {
+		var exit *exec.ExitError
+		if errors.As(err, &exit) && exit.ExitCode() == 1 {
+			return false, nil
+		}
+
+		return false, errors.Trace(err)
+	}
+
+	return true, nil
 }
