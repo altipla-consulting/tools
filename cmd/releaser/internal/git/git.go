@@ -1,6 +1,7 @@
 package git
 
 import (
+	"log"
 	"os/exec"
 	"sort"
 	"strings"
@@ -60,15 +61,18 @@ func PreviousTag() (string, error) {
 		tag := strings.Fields(line)[1]
 		if strings.HasPrefix(tag, "refs/tags/") {
 			tag = tag[len("refs/tags/"):]
+			tags = append(tags, tag)
 		}
-		tags = append(tags, tag)
 	}
 
 	if len(tags) < 2 {
 		return "", nil
 	}
 
+	log.Println(tags)
+
 	sort.Sort(sort.Reverse(semver.ByVersion(tags)))
+	log.Println(tags)
 	return tags[1], nil
 }
 

@@ -60,6 +60,7 @@ func Release(update string) error {
 	fmt.Print("Publish a new ", update, " version of ", aurora.Magenta(modname).Bold(), " ")
 	fmt.Println(aurora.Gray(22, "(current: "+current+",").Faint(), aurora.White("release: "+release), aurora.Gray(22, ")").Faint())
 	fmt.Println()
+	fmt.Println()
 
 	runner := &tasks.Runner{
 		Tasks: []tasks.Runnable{
