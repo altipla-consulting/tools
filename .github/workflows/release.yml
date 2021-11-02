@@ -85,3 +85,10 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/wave
         name: wave
+
+    - name: Release releaser
+      uses: altipla-consulting/go-release.actions@main
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        source: ./cmd/releaser
+        name: releaser
