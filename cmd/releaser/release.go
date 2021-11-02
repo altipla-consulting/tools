@@ -57,7 +57,7 @@ func Release(update string) error {
 	}
 
 	fmt.Println()
-	fmt.Println("Publish a new version of", aurora.Magenta(modname).Bold(), aurora.Gray(22, "(current: "+current+")").Faint())
+	fmt.Println("Publish a new", update, "version of", aurora.Magenta(modname).Bold(), aurora.Gray(22, "(current: "+current+", release: "+release+")").Faint())
 	fmt.Println()
 	fmt.Println()
 
