@@ -94,12 +94,17 @@ func (anim *animation) render(w io.Writer) {
 type ParentTask struct {
 	Message string
 	Tasks   []*Task
+	Disable bool
 
 	mx     sync.RWMutex
 	status taskStatus
 }
 
 func (task *ParentTask) Run() error {
+	if task.Disable {
+		return nil
+	}
+
 	task.mx.Lock()
 	task.status = taskStatusRunning
 	for _, child := range task.Tasks {
@@ -125,6 +130,10 @@ func (task *ParentTask) Run() error {
 }
 
 func (task *ParentTask) Render(w io.Writer) {
+	if task.Disable {
+		return
+	}
+
 	task.mx.RLock()
 	defer task.mx.RUnlock()
 

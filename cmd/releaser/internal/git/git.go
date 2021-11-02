@@ -23,7 +23,7 @@ func LatestRemoteTag() (string, error) {
 		return "", errors.Trace(err)
 	}
 
-	tags := []string{"v0.0.0"}
+	var tags []string
 	for _, line := range strings.Split(lines, "\n") {
 		if line == "" {
 			continue
@@ -36,6 +36,81 @@ func LatestRemoteTag() (string, error) {
 		tags = append(tags, tag)
 	}
 
+	if len(tags) == 0 {
+		return "", nil
+	}
+
 	sort.Sort(sort.Reverse(semver.ByVersion(tags)))
 	return tags[0], nil
+}
+
+func PreviousTag() (string, error) {
+	lines, err := run.GitCaptureOutput("ls-remote", "-q", "--tags", "--refs")
+	if err != nil {
+		return "", errors.Trace(err)
+	}
+
+	var tags []string
+	for _, line := range strings.Split(lines, "\n") {
+		if line == "" {
+			continue
+		}
+
+		tag := strings.Fields(line)[1]
+		if strings.HasPrefix(tag, "refs/tags/") {
+			tag = tag[len("refs/tags/"):]
+		}
+		tags = append(tags, tag)
+	}
+
+	if len(tags) < 2 {
+		return "", nil
+	}
+
+	sort.Sort(sort.Reverse(semver.ByVersion(tags)))
+	return tags[1], nil
+}
+
+func DirtyWorkingTree() (bool, error) {
+	status, err := run.GitCaptureOutput("status", "-s")
+	if err != nil {
+		return false, errors.Trace(err)
+	}
+	return len(status) > 0, nil
+}
+
+func RemoteHistoryClean() (bool, error) {
+	history, err := run.GitCaptureOutput("rev-list", "--count", "--left-only", "@{u}...HEAD")
+	if err != nil {
+		return false, errors.Trace(err)
+	}
+	return history == "0", nil
+}
+
+func Tag(tag string) error {
+	return errors.Trace(run.Git("tag", tag))
+}
+
+func RemoteURL(name string) (string, error) {
+	remote, err := run.GitCaptureOutput("remote", "get-url", name)
+	if err != nil {
+		return "", errors.Trace(err)
+	}
+	return remote, nil
+}
+
+func FirstCommit() (string, error) {
+	commit, err := run.GitCaptureOutput("rev-list", "--max-parents=0", "HEAD")
+	if err != nil {
+		return "", errors.Trace(err)
+	}
+	return commit, nil
+}
+
+func CommitLogFrom(from string) (string, error) {
+	commitlog, err := run.GitCaptureOutput("log", "--format=%s %h", from+"..HEAD")
+	if err != nil {
+		return "", errors.Trace(err)
+	}
+	return commitlog, nil
 }

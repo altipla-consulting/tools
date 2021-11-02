@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -11,6 +12,7 @@ import (
 	"golang.org/x/mod/modfile"
 	"libs.altipla.consulting/errors"
 	"tools.altipla.consulting/cmd/releaser/internal/git"
+	"tools.altipla.consulting/cmd/releaser/internal/run"
 	"tools.altipla.consulting/cmd/releaser/internal/tasks"
 )
 
@@ -24,6 +26,9 @@ func Release(update string) error {
 	current, err := git.LatestRemoteTag()
 	if err != nil {
 		return errors.Trace(err)
+	}
+	if current == "" {
+		current = "v0.0.0"
 	}
 	components := strings.Split(current, ".")
 	major, err := strconv.ParseInt(components[0][1:], 10, 64)
@@ -61,9 +66,94 @@ func Release(update string) error {
 				Message: "Prerequisites check",
 				Tasks: []*tasks.Task{
 					{
-						Message: "Check main branch",
-						Handler: releaseCheckMainBranch,
+						Message: "Check git remote",
+						Handler: func() error {
+							return errors.Trace(run.Git("ls-remote", "origin", "HEAD"))
+						},
 					},
+					{
+						Message: "Check main branch",
+						Handler: func() error {
+							branch, err := git.CurrentBranch()
+							if err != nil {
+								return errors.Trace(err)
+							}
+							if branch != "main" && branch != "master" {
+								return errors.Errorf("Branch master or main expected to make a new release. Current branch: " + branch)
+							}
+							return nil
+						},
+					},
+					{
+						Message: "Check local working tree",
+						Handler: func() error {
+							dirty, err := git.DirtyWorkingTree()
+							if err != nil {
+								return errors.Trace(err)
+							}
+							if dirty {
+								return errors.Errorf("Unclean working tree. Commit or stash changes first.")
+							}
+							return nil
+						},
+					},
+					{
+						Message: "Check remote history",
+						Handler: func() error {
+							clean, err := git.RemoteHistoryClean()
+							if err != nil {
+								return errors.Trace(err)
+							}
+							if !clean {
+								return errors.Errorf("Remote history differs. Please pull changes.")
+							}
+							return nil
+						},
+					},
+				},
+			},
+			&tasks.ParentTask{
+				Message: "Release new version",
+				Tasks: []*tasks.Task{
+					{
+						Message: "Tag repo",
+						Handler: func() error {
+							return errors.Trace(git.Tag(release))
+						},
+					},
+					{
+						Message: "Push tags",
+						Handler: func() error {
+							return errors.Trace(run.Git("push", "--follow-tags"))
+						},
+					},
+				},
+			},
+			&tasks.Task{
+				Message: "Create release draft on GitHub",
+				Handler: func() error {
+					remote, err := git.RemoteURL("origin")
+					if err != nil {
+						return errors.Trace(err)
+					}
+					repo := "https://github.com/" + strings.TrimSuffix(strings.Split(remote, ":")[1], ".git")
+					u, err := url.Parse(repo + "/releases/new")
+					if err != nil {
+						return errors.Trace(err)
+					}
+					qs := make(url.Values)
+					qs.Set("tag", release)
+					notes, err := releaseNotes(repo, release)
+					if err != nil {
+						return errors.Trace(err)
+					}
+					qs.Set("body", notes)
+					u.RawQuery = qs.Encode()
+					if err := run.OpenBrowser(u.String()); err != nil {
+						return errors.Trace(err)
+					}
+
+					return nil
 				},
 			},
 		},
@@ -76,20 +166,37 @@ func Release(update string) error {
 		return nil
 	}
 
-	_ = release
-
 	return nil
 }
 
-func releaseCheckMainBranch() error {
-	branch, err := git.CurrentBranch()
+func releaseNotes(repo, release string) (string, error) {
+	prev, err := git.PreviousTag()
 	if err != nil {
-		return errors.Trace(err)
+		return "", errors.Trace(err)
+	}
+	if prev == "" {
+		prev, err = git.FirstCommit()
+		if err != nil {
+			return "", errors.Trace(err)
+		}
 	}
 
-	if branch != "main" && branch != "master" {
-		return errors.Errorf("Branch master or main expected to make a new release. Current branch: " + branch)
+	commitlog, err := git.CommitLogFrom(prev)
+	if err != nil {
+		return "", errors.Trace(err)
+	}
+	if commitlog == "" {
+		return "", nil
 	}
 
-	return nil
+	var body []string
+	for _, line := range strings.Split(commitlog, "\n") {
+		index := strings.LastIndex(line, " ")
+		body = append(body, "- "+line[:index]+"  "+line[index+1:])
+	}
+
+	body = append(body, "", "")
+	body = append(body, repo+"/compare/"+prev+"..."+release)
+
+	return strings.Join(body, "\n"), nil
 }
