@@ -10,7 +10,7 @@ import (
 )
 
 func CurrentBranch() (string, error) {
-	branch, err := run.GitCaptureOutput("rev-parse", "--abbrev-ref", "HEAD")
+	branch, err := run.Git("rev-parse", "--abbrev-ref", "HEAD")
 	if err != nil {
 		return "", errors.Trace(err)
 	}
@@ -18,7 +18,7 @@ func CurrentBranch() (string, error) {
 }
 
 func LatestRemoteTag() (string, error) {
-	lines, err := run.GitCaptureOutput("ls-remote", "-q", "--tags", "--refs")
+	lines, err := run.Git("ls-remote", "-q", "--tags", "--refs")
 	if err != nil {
 		return "", errors.Trace(err)
 	}
@@ -45,7 +45,7 @@ func LatestRemoteTag() (string, error) {
 }
 
 func PreviousTag() (string, error) {
-	lines, err := run.GitCaptureOutput("ls-remote", "-q", "--tags", "--refs")
+	lines, err := run.Git("ls-remote", "-q", "--tags", "--refs")
 	if err != nil {
 		return "", errors.Trace(err)
 	}
@@ -72,7 +72,7 @@ func PreviousTag() (string, error) {
 }
 
 func DirtyWorkingTree() (bool, error) {
-	status, err := run.GitCaptureOutput("status", "-s")
+	status, err := run.Git("status", "-s")
 	if err != nil {
 		return false, errors.Trace(err)
 	}
@@ -80,19 +80,20 @@ func DirtyWorkingTree() (bool, error) {
 }
 
 func RemoteHistoryClean() (bool, error) {
-	history, err := run.GitCaptureOutput("rev-list", "--count", "--left-only", "@{u}...HEAD")
+	history, err := run.Git("rev-list", "--count", "--left-only", "@{u}...HEAD")
 	if err != nil {
 		return false, errors.Trace(err)
 	}
-	return history == "0", nil
+	return history == "" || history == "0", nil
 }
 
 func Tag(tag string) error {
-	return errors.Trace(run.Git("tag", tag))
+	_, err := run.Git("tag", tag)
+	return errors.Trace(err)
 }
 
 func RemoteURL(name string) (string, error) {
-	remote, err := run.GitCaptureOutput("remote", "get-url", name)
+	remote, err := run.Git("remote", "get-url", name)
 	if err != nil {
 		return "", errors.Trace(err)
 	}
@@ -100,7 +101,7 @@ func RemoteURL(name string) (string, error) {
 }
 
 func FirstCommit() (string, error) {
-	commit, err := run.GitCaptureOutput("rev-list", "--max-parents=0", "HEAD")
+	commit, err := run.Git("rev-list", "--max-parents=0", "HEAD")
 	if err != nil {
 		return "", errors.Trace(err)
 	}
@@ -108,7 +109,7 @@ func FirstCommit() (string, error) {
 }
 
 func CommitLogFrom(from string) (string, error) {
-	commitlog, err := run.GitCaptureOutput("log", "--format=%s %h", from+"..HEAD")
+	commitlog, err := run.Git("log", "--format=%s %h", from+"..HEAD")
 	if err != nil {
 		return "", errors.Trace(err)
 	}

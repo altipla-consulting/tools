@@ -19,15 +19,20 @@ const (
 	taskStatusFailed
 )
 
+type TaskHandler func(w io.Writer) error
+
 type Task struct {
 	Message string
-	Handler func() error
-	level   int
+	Handler TaskHandler
+	Disable bool
 
-	mx     sync.RWMutex
-	status taskStatus
-	anim   animation
-	err    error
+	level int
+
+	mx       sync.RWMutex
+	status   taskStatus
+	anim     animation
+	err      error
+	capturer *logsCapturer
 }
 
 func (task *Task) indentation() string {
@@ -35,12 +40,17 @@ func (task *Task) indentation() string {
 }
 
 func (task *Task) Run() error {
+	if task.Disable {
+		return nil
+	}
+
 	task.mx.Lock()
 	task.status = taskStatusRunning
 	task.anim.restart()
+	task.capturer = &logsCapturer{}
 	task.mx.Unlock()
 
-	err := task.Handler()
+	err := task.Handler(task.capturer)
 
 	task.mx.Lock()
 	defer task.mx.Unlock()
@@ -54,6 +64,10 @@ func (task *Task) Run() error {
 }
 
 func (task *Task) Render(w io.Writer) {
+	if task.Disable {
+		return
+	}
+
 	task.mx.RLock()
 	defer task.mx.RUnlock()
 
@@ -71,8 +85,13 @@ func (task *Task) Render(w io.Writer) {
 
 	fmt.Fprintln(w, task.Message)
 
-	if task.status == taskStatusFailed {
-		fmt.Fprintln(w, aurora.Yellow(task.indentation()+"  → ").Faint(), aurora.Red(task.err.Error()))
+	switch task.status {
+	case taskStatusFailed:
+		fmt.Fprintln(w, aurora.Gray(22, task.indentation()+"  → ").Faint(), aurora.Red(task.err.Error()))
+	case taskStatusRunning:
+		if task.capturer.LastLine() != "" {
+			fmt.Fprintln(w, aurora.Gray(22, task.indentation()+"  → "+task.capturer.LastLine()).Faint())
+		}
 	}
 }
 

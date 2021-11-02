@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/url"
 	"strconv"
@@ -67,13 +68,14 @@ func Release(update string) error {
 				Tasks: []*tasks.Task{
 					{
 						Message: "Check git remote",
-						Handler: func() error {
-							return errors.Trace(run.Git("ls-remote", "origin", "HEAD"))
+						Handler: func(w io.Writer) error {
+							_, err := run.Git("ls-remote", "origin", "HEAD")
+							return errors.Trace(err)
 						},
 					},
 					{
 						Message: "Check main branch",
-						Handler: func() error {
+						Handler: func(w io.Writer) error {
 							branch, err := git.CurrentBranch()
 							if err != nil {
 								return errors.Trace(err)
@@ -86,7 +88,7 @@ func Release(update string) error {
 					},
 					{
 						Message: "Check local working tree",
-						Handler: func() error {
+						Handler: func(w io.Writer) error {
 							dirty, err := git.DirtyWorkingTree()
 							if err != nil {
 								return errors.Trace(err)
@@ -99,7 +101,7 @@ func Release(update string) error {
 					},
 					{
 						Message: "Check remote history",
-						Handler: func() error {
+						Handler: func(w io.Writer) error {
 							clean, err := git.RemoteHistoryClean()
 							if err != nil {
 								return errors.Trace(err)
@@ -116,22 +118,31 @@ func Release(update string) error {
 				Message: "Release new version",
 				Tasks: []*tasks.Task{
 					{
+						Message: "Commit new tag",
+						Handler: func(w io.Writer) error {
+							_, err := run.GitCapture(w, "commit", "--allow-empty", "-m", release[1:])
+							return errors.Trace(err)
+						},
+					},
+					{
 						Message: "Tag repo",
-						Handler: func() error {
+						Handler: func(w io.Writer) error {
 							return errors.Trace(git.Tag(release))
 						},
 					},
 					{
 						Message: "Push tags",
-						Handler: func() error {
-							return errors.Trace(run.Git("push", "--follow-tags"))
+						Handler: func(w io.Writer) error {
+							_, err := run.GitCapture(w, "push", "--follow-tags")
+							return errors.Trace(err)
 						},
 					},
 				},
 			},
 			&tasks.Task{
+				Disable: true,
 				Message: "Create release draft on GitHub",
-				Handler: func() error {
+				Handler: func(w io.Writer) error {
 					remote, err := git.RemoteURL("origin")
 					if err != nil {
 						return errors.Trace(err)
