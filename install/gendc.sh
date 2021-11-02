@@ -15,5 +15,5 @@ LATEST_VERSION=$(curl -sL https://api.github.com/repos/altipla-consulting/tools/
 echo "----------"
 echo " [*] downloading $TOOL $LATEST_VERSION"
 echo "----------"
-curl -L https://github.com/altipla-consulting/tools/releases/download/${LATEST_VERSION}/${TOOL}_${LATEST_VERSION}_linux_amd64 > /usr/local/bin/$TOOL
+curl -L https://github.com/altipla-consulting/tools/releases/download/${LATEST_VERSION}/${TOOL}_linux_amd64 > /usr/local/bin/$TOOL
 chmod +x /usr/local/bin/$TOOL
