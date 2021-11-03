@@ -30,7 +30,7 @@ do
   echo "----------"
   echo " [*] downloading $app $LATEST_VERSION"
   echo "----------"
-  curl -L https://github.com/altipla-consulting/tools/releases/download/${LATEST_VERSION}/${app}_linux_amd64 > /usr/local/bin/$app
+  curl -L https://github.com/altipla-consulting/tools/releases/download/${LATEST_VERSION}/${app}-linux-amd64 > /usr/local/bin/$app
   chmod +x /usr/local/bin/$app
 
   echo "----------"
