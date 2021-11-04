@@ -7,6 +7,7 @@ import (
 
 	"golang.org/x/mod/semver"
 	"libs.altipla.consulting/errors"
+
 	"tools.altipla.consulting/cmd/releaser/internal/run"
 )
 

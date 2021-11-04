@@ -47,7 +47,7 @@ func (task *Task) Run() error {
 	task.mx.Lock()
 	task.status = taskStatusRunning
 	task.anim.restart()
-	task.capturer = &logsCapturer{}
+	task.capturer = new(logsCapturer)
 	task.mx.Unlock()
 
 	err := task.Handler(task.capturer)

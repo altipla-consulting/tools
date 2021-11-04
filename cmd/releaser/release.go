@@ -5,6 +5,8 @@ import (
 	"io"
 	"io/ioutil"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -12,17 +14,17 @@ import (
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/mod/modfile"
 	"libs.altipla.consulting/errors"
+
 	"tools.altipla.consulting/cmd/releaser/internal/git"
 	"tools.altipla.consulting/cmd/releaser/internal/run"
 	"tools.altipla.consulting/cmd/releaser/internal/tasks"
 )
 
 func Release(update string) error {
-	gomod, err := ioutil.ReadFile("go.mod")
+	modname, err := guessModname()
 	if err != nil {
 		return errors.Trace(err)
 	}
-	modname := modfile.ModulePath(gomod)
 
 	current, err := git.LatestRemoteTag()
 	if err != nil {
@@ -230,4 +232,20 @@ func releaseNotes(repo, release string) (string, error) {
 	body = append(body, repo+"/compare/"+prev+"..."+release)
 
 	return strings.Join(body, "\n"), nil
+}
+
+func guessModname() (string, error) {
+	gomod, err := ioutil.ReadFile("go.mod")
+	if err != nil {
+		if os.IsNotExist(err) {
+			wd, err := os.Getwd()
+			if err != nil {
+				return "", errors.Trace(err)
+			}
+			return filepath.Base(wd), nil
+		}
+
+		return "", errors.Trace(err)
+	}
+	return modfile.ModulePath(gomod), nil
 }
