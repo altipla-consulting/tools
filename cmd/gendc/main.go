@@ -125,13 +125,20 @@ func writeDockerCompose(settings *configFile) error {
 		}
 	}
 
+	if os.Getenv("SSH_AUTH_SOCK") == "" {
+		log.Warning("SSH_AUTH_SOCK env variable is not defined. SSH agent is not running right now.")
+		log.Warning("You have to configure a SSH agent to run local services.")
+		log.Warning("File will be generated but it won't work until the agent is successfully running.")
+	}
+
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return errors.Trace(err)
 	}
+	const sshAuthSockEnv = "${SSH_AUTH_SOCK:?Missing SSH_AUTH_SOCK}"
 	for _, app := range settings.Apps {
 		env := map[string]string{
-			"SSH_AUTH_SOCK": os.Getenv("SSH_AUTH_SOCK"),
+			"SSH_AUTH_SOCK": sshAuthSockEnv,
 			"LOCAL_RAVENDB": "http://ravendb:8080",
 			"K_SERVICE":     app.Name,
 		}
@@ -148,7 +155,7 @@ func writeDockerCompose(settings *configFile) error {
 			Command: []string{"reloader", "run", ".", "-r", "-e", ".pbtext,.yml,.yaml", "-w", "../pkg", "-w", "../internal", "-w", "../protos"},
 			Env:     env,
 			Volumes: []string{
-				os.Getenv("SSH_AUTH_SOCK") + ":" + os.Getenv("SSH_AUTH_SOCK"),
+				sshAuthSockEnv + ":" + sshAuthSockEnv,
 				".:/workspace",
 				home + "/go/bin:/go/bin",
 				home + "/go/pkg:/go/pkg",
@@ -167,10 +174,10 @@ func writeDockerCompose(settings *configFile) error {
 			Image:   "eu.gcr.io/altipla-tools/node:latest",
 			Command: []string{"npm", "start"},
 			Env: map[string]string{
-				"SSH_AUTH_SOCK": os.Getenv("SSH_AUTH_SOCK"),
+				"SSH_AUTH_SOCK": sshAuthSockEnv,
 			},
 			Volumes: []string{
-				os.Getenv("SSH_AUTH_SOCK") + ":" + os.Getenv("SSH_AUTH_SOCK"),
+				sshAuthSockEnv + ":" + sshAuthSockEnv,
 				".:/workspace",
 				home + "/.config/vite-config:/home/container/.config/vite-config",
 			},
