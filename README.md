@@ -43,8 +43,8 @@ There are multiple tools inside this repo with different levels of activity and 
 | Badge | Meaning |
 |-------|---------|
 | ![](https://img.shields.io/badge/state-active-brightgreen) | Actively used. |
-| ![](https://img.shields.io/badge/state-deprecated-red) | The tool is deprecated and being replaced or removed. Do not use for new projects, it will be removed in the future. |
-| ![](https://img.shields.io/badge/usage-external-blue) | The application is prepared to be run outside our infrastructure and anyone can run it or benefit from it easily. Any bugs will be fixed. |
+| ![](https://img.shields.io/badge/state-deprecated-red) | The tool is deprecated and being replaced or removed.<br>Do not use for new projects, it will be removed in the future. |
+| ![](https://img.shields.io/badge/usage-external-blue) | Prepared to run anywhere outside our infrastructure.<br>Anyone can use it easily.<br>Breaking changes will be avoided as much as possible.<br>Any bugs found will be promptly fixed. |
 
 
 ## Contributing
