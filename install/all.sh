@@ -13,6 +13,7 @@ LATEST_VERSION=$(curl -sL https://api.github.com/repos/altipla-consulting/tools/
 
 TOOLS=(
   ci
+  configure-dev-machine
   gaestage
   gendc
   impsort

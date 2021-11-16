@@ -92,3 +92,10 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/releaser
         name: releaser
+
+    - name: Release configure-dev-machine
+      uses: altipla-consulting/go-release.actions@main
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        source: ./cmd/configure-dev-machine
+        name: configure-dev-machine
