@@ -6,7 +6,7 @@ Internal tools for developers in Altipla Consulting.
 
 ## Install
 
-Install all tools in one go:
+Install all tools with a single command:
 
 ```shell
 curl -s https://raw.githubusercontent.com/altipla-consulting/tools/master/install/all.sh | sudo bash
@@ -21,21 +21,30 @@ curl -s https://raw.githubusercontent.com/altipla-consulting/tools/master/instal
 
 ## Tools
 
-There are multiple tools inside this repo with different levels of activity and support. The support columns indicates if the tool is prepared to be run outside our infrastructure and we actively fix any bug that may occur in that external scenarios. Internal tools are provided as-is without any kind of support.
+There are multiple tools inside this repo with different levels of activity and support and this table will give an overview of all of them.
 
 | Tool | State | Support | Docs |
 |------|-------|---------|------|
-| `ci` | Actively used | Supported | [Docs](./cmd/ci/README.md) |
-| `gaestage` | Actively used | Supported | [Docs](./cmd/gaestage/README.md) |
-| `gendc` | Actively used | Unsupported.<br>Very opinionated | [Docs](./cmd/gendc/README.md) |
-| `impsort` | Actively used | Supported | [Docs](./cmd/impsort/README.md) |
-| `jnet` | Actively used | Supported | [Docs](./cmd/jnet/README.md) |
-| `linter` | Actively used | Unsupported.<br>Very opinionated | |
-| `previewer-netlify` | Deprecated.<br>Use `wave` instead. | Unsupported | [Docs](./cmd/previewer/README.md) |
-| `pub` | Deprecated.<br>Use `wave` instead. | Unsupported | [Docs](./cmd/pub/README.md) |
-| `reloader` | Actively used | Supported | [Docs](./cmd/reloader/README.md) |
-| `runner` | Deprecated.<br>Use `wave` instead. | Unsupported | [Docs](./cmd/runner/README.md) |
-| `wave` | Actively used. | Unsupported | [Docs](./cmd/wave/README.md) |
+| `ci` | ![](https://img.shields.io/badge/state-active-brightgreen) | ![](https://img.shields.io/badge/usage-external-blue) | [Docs](./cmd/ci/README.md) |
+| `configure-dev-machine` | ![](https://img.shields.io/badge/state-active-brightgreen) | | [Docs](./cmd/configure-dev-machine/README.md) |
+| `gaestage` | ![](https://img.shields.io/badge/state-active-brightgreen) | ![](https://img.shields.io/badge/usage-external-blue) | [Docs](./cmd/gaestage/README.md) |
+| `gendc` | ![](https://img.shields.io/badge/state-active-brightgreen) | | [Docs](./cmd/gendc/README.md) |
+| `impsort` | ![](https://img.shields.io/badge/state-active-brightgreen) | ![](https://img.shields.io/badge/usage-external-blue) | [Docs](./cmd/impsort/README.md) |
+| `jnet` | ![](https://img.shields.io/badge/state-active-brightgreen) | ![](https://img.shields.io/badge/usage-external-blue) | [Docs](./cmd/jnet/README.md) |
+| `linter` | ![](https://img.shields.io/badge/state-active-brightgreen) | | |
+| `previewer-netlify` | ![](https://img.shields.io/badge/state-deprecated-red) | | [Docs](./cmd/previewer/README.md) |
+| `pub` | ![](https://img.shields.io/badge/state-deprecated-red) | | [Docs](./cmd/pub/README.md) |
+| `reloader` | ![](https://img.shields.io/badge/state-active-brightgreen) | ![](https://img.shields.io/badge/usage-external-blue) | [Docs](./cmd/reloader/README.md) |
+| `runner` | ![](https://img.shields.io/badge/state-deprecated-red) | | [Docs](./cmd/runner/README.md) |
+| `wave` | ![](https://img.shields.io/badge/state-active-brightgreen). | | [Docs](./cmd/wave/README.md) |
+
+### Legend
+
+| Badge | Meaning |
+|-------|---------|
+| ![](https://img.shields.io/badge/state-active-brightgreen) | Actively used. |
+| ![](https://img.shields.io/badge/state-deprecated-red) | The tool is deprecated and being replaced or removed. Do not use for new projects, it will be removed in the future. |
+| ![](https://img.shields.io/badge/usage-external-blue) | The application is prepared to be run outside our infrastructure and anyone can run it or benefit from it easily. Any bugs will be fixed. |
 
 
 ## Contributing
