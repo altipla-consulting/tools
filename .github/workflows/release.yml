@@ -127,6 +127,6 @@ jobs:
     - name: Release install scripts
       run: |-
         gcloud --quiet components install alpha
-        gcloud alpha storage cp install gs://tools.altipla.consulting
+        gcloud alpha storage cp -R install gs://tools.altipla.consulting
         sed -i 's/VERSION/${{ steps.version.outputs.VERSION }}/g' machine/script
         gcloud alpha storage cp machine/script gs://tools.altipla.consulting/machine
