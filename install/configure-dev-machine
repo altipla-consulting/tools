@@ -15,5 +15,5 @@ LATEST_VERSION=$(curl -sL https://api.github.com/repos/altipla-consulting/tools/
 curl -sL https://github.com/altipla-consulting/tools/releases/download/${LATEST_VERSION}/${TOOL}-linux-amd64 | sudo tee /usr/local/bin/$TOOL > /dev/null
 sudo chmod +x /usr/local/bin/$TOOL
 
-configure-dev-machine install
+/usr/local/bin/configure-dev-machine install
 echo "REPLACE_VERSION" > ~/.config/configure-dev-machine/version.txt
