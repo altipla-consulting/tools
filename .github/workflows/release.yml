@@ -13,6 +13,10 @@ jobs:
       contents: write
 
     steps:
+    - name: Get the version
+      id: version
+      run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+
     - name: Checkout code
       uses: actions/checkout@master
 
@@ -124,3 +128,5 @@ jobs:
       run: |-
         gcloud --quiet components install alpha
         gcloud alpha storage cp install gs://tools.altipla.consulting
+        sed -i 's/VERSION/${{ steps.version.outputs.VERSION }}/g' machine/script
+        gcloud alpha storage cp machine/script gs://tools.altipla.consulting/machine
