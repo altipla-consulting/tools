@@ -1,6 +1,7 @@
 package config
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -18,4 +19,19 @@ func Filename(filename string) (string, error) {
 	}
 
 	return filepath.Join(configdir, "configure-dev-machine", filename), nil
+}
+
+func Version() (string, error) {
+	filename, err := Filename("version.txt")
+	if err != nil {
+		return "", errors.Trace(err)
+	}
+	version, err := ioutil.ReadFile(filename)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return "dev", nil
+		}
+		return "", errors.Trace(err)
+	}
+	return string(version), nil
 }

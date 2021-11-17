@@ -10,13 +10,13 @@ import (
 var filter string
 
 func init() {
-	CmdInstall.PersistentFlags().StringVarP(&filter, "filter", "f", "", "Filtra los instaladores a ejecutar")
+	CmdInstall.PersistentFlags().StringVarP(&filter, "filter", "f", "", "Filter installers to run by name.")
 	CmdRoot.AddCommand(CmdInstall)
 }
 
 var CmdInstall = &cobra.Command{
 	Use:          "install",
-	Short:        "Ejecuta los instaladores",
+	Short:        "Run all the installers.",
 	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return errors.Trace(installers.Run(filter))

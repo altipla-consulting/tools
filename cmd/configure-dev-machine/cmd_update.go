@@ -7,12 +7,12 @@ import (
 )
 
 func init() {
-	CmdRoot.AddCommand(CmdUpdate)
+	CmdRoot.AddCommand(CmdPrintUpdate)
 }
 
-var CmdUpdate = &cobra.Command{
-	Use:   "update",
-	Short: "Imprime el comando de actualización de la herramienta.",
+var CmdPrintUpdate = &cobra.Command{
+	Use:   "print-update",
+	Short: "Print update command.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		o := box.Box{}
 		o.AddLine("Run the following command to update:")

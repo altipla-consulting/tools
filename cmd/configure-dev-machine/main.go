@@ -7,8 +7,6 @@ import (
 	"libs.altipla.consulting/errors"
 )
 
-var Version = "dev"
-
 func main() {
 	if err := CmdRoot.Execute(); err != nil {
 		log.Error(err.Error())

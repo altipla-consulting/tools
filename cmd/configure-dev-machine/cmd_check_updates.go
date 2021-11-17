@@ -1,15 +1,17 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
 	"libs.altipla.consulting/box"
+	"libs.altipla.consulting/env"
 	"libs.altipla.consulting/errors"
 
 	"tools.altipla.consulting/cmd/configure-dev-machine/internal/config"
@@ -19,12 +21,15 @@ func init() {
 	CmdRoot.AddCommand(CmdCheckUpdates)
 }
 
+type ghRelease struct {
+	TagName string `json:"tag_name"`
+}
+
 var CmdCheckUpdates = &cobra.Command{
 	Use:   "check-updates",
-	Short: "Comprueba si hay actualizaciones de esta herramienta.",
+	Short: "Check if there are any updates to the tool.",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// Jenkins y el entorno de desarrollo no deben comprobar la versión
-		if Version == "dev" || os.Getenv("CI") == "true" {
+		if env.IsJenkins() {
 			return nil
 		}
 
@@ -32,8 +37,7 @@ var CmdCheckUpdates = &cobra.Command{
 		if err != nil {
 			return errors.Trace(err)
 		}
-
-		lastUpdate := time.Time{}
+		var lastUpdate time.Time
 		if content, err := ioutil.ReadFile(filename); err != nil && !os.IsNotExist(err) {
 			return errors.Trace(err)
 		} else if err == nil {
@@ -43,23 +47,32 @@ var CmdCheckUpdates = &cobra.Command{
 		}
 
 		if time.Now().Sub(lastUpdate) > 1*time.Hour {
-			reply, err := http.Get("https://tools.altipla.consulting/version-manifest/configure-dev-machine")
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://api.github.com/repos/altipla-consulting/tools/releases/latest", nil)
 			if err != nil {
 				return errors.Trace(err)
 			}
-			defer reply.Body.Close()
-			if reply.StatusCode != http.StatusOK {
-				return errors.Errorf("unexpected status: %s", reply.Status)
-			}
-			body, err := ioutil.ReadAll(reply.Body)
+			resp, err := http.DefaultClient.Do(req)
 			if err != nil {
 				return errors.Trace(err)
 			}
-			expected := strings.TrimSpace(string(body))
+			defer resp.Body.Close()
+			if resp.StatusCode != http.StatusOK {
+				return errors.Errorf("unexpected github status: %s", resp.Status)
+			}
+			var release ghRelease
+			if err := json.NewDecoder(resp.Body).Decode(&release); err != nil {
+				return errors.Trace(err)
+			}
 
-			if expected != Version {
+			version, err := config.Version()
+			if err != nil {
+				return errors.Trace(err)
+			}
+			if release.TagName != version {
 				o := box.Box{}
-				o.AddLine("Update available ", aurora.Gray(18, Version), " → ", aurora.BrightGreen(expected))
+				o.AddLine("Update available ", aurora.Gray(18, version), " → ", aurora.BrightGreen(release.TagName))
 				o.AddLine()
 				o.AddLine("Run the following command to update:")
 				o.AddLine(aurora.Blue("curl https://tools.altipla.consulting/install/configure-dev-machine | bash"))
