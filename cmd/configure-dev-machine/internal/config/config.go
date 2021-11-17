@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"libs.altipla.consulting/errors"
 )
@@ -33,5 +34,5 @@ func Version() (string, error) {
 		}
 		return "", errors.Trace(err)
 	}
-	return string(version), nil
+	return strings.TrimSpace(string(version)), nil
 }
