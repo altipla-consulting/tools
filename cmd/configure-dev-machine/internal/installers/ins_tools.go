@@ -18,7 +18,7 @@ func (ins *insTools) Check() (*CheckResult, error) {
 
 func (ins *insTools) Install() error {
 	script := `
-		curl -s https://raw.githubusercontent.com/altipla-consulting/tools/master/install/all.sh | sudo bash
+		curl -s https://tools.altipla.consulting/install/all | sudo bash
   `
 	return errors.Trace(run.Shell(script))
 }
