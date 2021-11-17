@@ -9,13 +9,13 @@ Internal tools for developers in Altipla Consulting.
 Install all tools with a single command:
 
 ```shell
-curl -s https://tools.altipla.consulting/install/all | sudo bash
+curl -sL https://tools.altipla.consulting/install/all | sudo bash
 ```
 
 Install only one of the tools:
 
 ```shell
-curl -s https://tools.altipla.consulting/install/jnet | sudo bash
+curl -sL https://tools.altipla.consulting/install/jnet | sudo bash
 ```
 
 
