@@ -11,10 +11,25 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@master
 
-    - name: Configure Go
+    - name: Setup Go
       uses: actions/setup-go@v2
       with:
         go-version: 1.17.3
+    - name: Setup gcloud SDK
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        project_id: ${{ env.PROJECT_ID }}
+
+    - name: Authenticate to Google Cloud
+      id: auth
+      uses: google-github-actions/auth@main
+      with:
+        workload_identity_provider: projects/1060593636030/locations/global/workloadIdentityPools/github/providers/github
+        service_account: gha-tools@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+        create_credentials_file: true
+    - name: Login to Google Cloud
+      run: |-
+        gcloud auth login --brief --cred-file="${{ steps.auth.outputs.credentials_file_path }}"
 
     - name: Release ci
       uses: altipla-consulting/go-release.actions@main
@@ -99,3 +114,8 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/configure-dev-machine
         name: configure-dev-machine
+
+    - name: Release install scripts
+      run: |-
+        gcloud --quiet components install alpha
+        gcloud alpha storage cp install gs://tools.altipla.consulting
