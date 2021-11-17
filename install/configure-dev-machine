@@ -12,7 +12,7 @@ fi
 TOOL=configure-dev-machine
 LATEST_VERSION=$(curl -sL https://api.github.com/repos/altipla-consulting/tools/releases/latest | jq -r '.tag_name')
 
-curl -sL https://github.com/altipla-consulting/tools/releases/download/${LATEST_VERSION}/${TOOL}-linux-amd64 > sudo tee /usr/local/bin/$TOOL
+curl -sL https://github.com/altipla-consulting/tools/releases/download/${LATEST_VERSION}/${TOOL}-linux-amd64 | sudo tee /usr/local/bin/$TOOL > /dev/null
 sudo chmod +x /usr/local/bin/$TOOL
 
 echo "REPLACE_VERSION" > ~/.config/configure-dev-machine/version.txt
