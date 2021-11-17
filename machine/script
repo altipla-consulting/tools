@@ -1,7 +1,0 @@
-#!/bin/bash
-
-set -eu
-
-echo "VERSION" > ~/.config/configure-dev-machine/version.txt
-curl -s https://tools.altipla.consulting/install/configure-dev-machine | sudo bash
-configure-dev-machine install
