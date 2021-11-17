@@ -23,14 +23,14 @@ jobs:
     - name: Setup gcloud SDK
       uses: google-github-actions/setup-gcloud@master
       with:
-        project_id: ${{ env.PROJECT_ID }}
+        project_id: altipla-tools
 
     - name: Authenticate to Google Cloud
       id: auth
       uses: google-github-actions/auth@main
       with:
         workload_identity_provider: projects/1060593636030/locations/global/workloadIdentityPools/github/providers/github
-        service_account: gha-tools@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+        service_account: gha-tools@precise-truck-89123.iam.gserviceaccount.com
         create_credentials_file: true
     - name: Login to Google Cloud
       run: |-
