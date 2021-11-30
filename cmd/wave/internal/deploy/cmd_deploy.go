@@ -102,7 +102,10 @@ var Cmd = &cobra.Command{
 		if len(flags.VolumeSecret) > 0 || len(flags.EnvSecret) > 0 {
 			var secrets []string
 			for _, secret := range flags.VolumeSecret {
-				secrets = append(secrets, "/etc/secrets/"+secret+"="+secret+":latest")
+				if secret == "ravendb-client-credentials" {
+					secrets = append(secrets, "/etc/secrets/"+secret+"="+secret+":latest")
+				}
+				secrets = append(secrets, "/etc/secrets-v2/"+secret+"/value="+secret+":latest")
 			}
 			for _, secret := range flags.EnvSecret {
 				varname := strings.Replace(strings.ToUpper(secret), "-", "_", -1)
