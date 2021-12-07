@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.2
 	github.com/atlassian/go-sentry-api v0.0.0-20210507210027-8175592dcf60
+	github.com/ebikt/go-debian v0.0.0-20190529211728-a1557c0af52d
 	github.com/google/go-github/v32 v32.1.0
 	github.com/google/go-jsonnet v0.17.0
 	github.com/gosuri/uilive v0.0.4

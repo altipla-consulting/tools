@@ -1,15 +1,13 @@
 package config
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"libs.altipla.consulting/errors"
 )
 
-func Filename(filename string) (string, error) {
+func UserFile(filename string) (string, error) {
 	configdir, err := os.UserConfigDir()
 	if err != nil {
 		return "", errors.Trace(err)
@@ -20,19 +18,4 @@ func Filename(filename string) (string, error) {
 	}
 
 	return filepath.Join(configdir, "configure-dev-machine", filename), nil
-}
-
-func Version() (string, error) {
-	filename, err := Filename("version.txt")
-	if err != nil {
-		return "", errors.Trace(err)
-	}
-	version, err := ioutil.ReadFile(filename)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return "dev", nil
-		}
-		return "", errors.Trace(err)
-	}
-	return strings.TrimSpace(string(version)), nil
 }

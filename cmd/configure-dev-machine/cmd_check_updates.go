@@ -1,10 +1,7 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"time"
 
@@ -15,14 +12,11 @@ import (
 	"libs.altipla.consulting/errors"
 
 	"tools.altipla.consulting/cmd/configure-dev-machine/internal/config"
+	"tools.altipla.consulting/cmd/configure-dev-machine/internal/version"
 )
 
 func init() {
 	CmdRoot.AddCommand(CmdCheckUpdates)
-}
-
-type ghRelease struct {
-	TagName string `json:"tag_name"`
 }
 
 var CmdCheckUpdates = &cobra.Command{
@@ -33,7 +27,7 @@ var CmdCheckUpdates = &cobra.Command{
 			return nil
 		}
 
-		filename, err := config.Filename("last-update-check.txt")
+		filename, err := config.UserFile("last-update-check.txt")
 		if err != nil {
 			return errors.Trace(err)
 		}
@@ -47,35 +41,16 @@ var CmdCheckUpdates = &cobra.Command{
 		}
 
 		if time.Now().Sub(lastUpdate) > 1*time.Hour {
-			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-			defer cancel()
-			req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://api.github.com/repos/altipla-consulting/tools/releases/latest", nil)
+			info, err := version.FetchInfo()
 			if err != nil {
 				return errors.Trace(err)
 			}
-			resp, err := http.DefaultClient.Do(req)
-			if err != nil {
-				return errors.Trace(err)
-			}
-			defer resp.Body.Close()
-			if resp.StatusCode != http.StatusOK {
-				return errors.Errorf("unexpected github status: %s", resp.Status)
-			}
-			var release ghRelease
-			if err := json.NewDecoder(resp.Body).Decode(&release); err != nil {
-				return errors.Trace(err)
-			}
-
-			version, err := config.Version()
-			if err != nil {
-				return errors.Trace(err)
-			}
-			if release.TagName != version {
+			if info.CurrentlyInstalled != info.Latest {
 				o := box.Box{}
-				o.AddLine("Update available ", aurora.Gray(18, version), " → ", aurora.BrightGreen(release.TagName))
+				o.AddLine("Update available ", aurora.Gray(18, info.CurrentlyInstalled), " → ", aurora.BrightGreen(info.Latest))
 				o.AddLine()
 				o.AddLine("Run the following command to update:")
-				o.AddLine(aurora.Blue("curl -sL https://tools.altipla.consulting/install/configure-dev-machine | bash"))
+				o.AddLine(aurora.Blue("apt update && apt install configure-dev-machine && configure-dev-machine install"))
 				o.Render()
 
 				return nil

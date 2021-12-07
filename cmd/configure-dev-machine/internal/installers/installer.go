@@ -84,7 +84,7 @@ func Run(filter string) error {
 	log.Info("======================================================================")
 	log.Info(">>> configure ~/.bashrc file")
 	log.Info("======================================================================")
-	filename, err := config.Filename("bashrc.sh")
+	filename, err := config.UserFile("bashrc.sh")
 	if err != nil {
 		return errors.Trace(err)
 	}

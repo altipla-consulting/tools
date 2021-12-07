@@ -12,7 +12,7 @@ Install all tools with a single command:
 curl -sL https://tools.altipla.consulting/install/all | sudo bash
 ```
 
-Install only one of the tools:
+Install only one of the tools (only for tools **with Support = External**):
 
 ```shell
 curl -sL https://tools.altipla.consulting/install/jnet | sudo bash
@@ -34,6 +34,7 @@ There are multiple tools inside this repo with different levels of activity and 
 | `linter` | ![](https://img.shields.io/badge/state-active-brightgreen) | | |
 | `previewer-netlify` | ![](https://img.shields.io/badge/state-deprecated-red) | | [Docs](./cmd/previewer/README.md) |
 | `pub` | ![](https://img.shields.io/badge/state-deprecated-red) | | [Docs](./cmd/pub/README.md) |
+| `releaser` | ![](https://img.shields.io/badge/state-active-brightgreen) | ![](https://img.shields.io/badge/usage-external-blue) | [Docs](./cmd/releaser/README.md) |
 | `reloader` | ![](https://img.shields.io/badge/state-active-brightgreen) | ![](https://img.shields.io/badge/usage-external-blue) | [Docs](./cmd/reloader/README.md) |
 | `runner` | ![](https://img.shields.io/badge/state-deprecated-red) | | [Docs](./cmd/runner/README.md) |
 | `wave` | ![](https://img.shields.io/badge/state-active-brightgreen). | | [Docs](./cmd/wave/README.md) |

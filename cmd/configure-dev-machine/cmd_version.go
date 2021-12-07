@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"libs.altipla.consulting/errors"
-	"tools.altipla.consulting/cmd/configure-dev-machine/internal/config"
+	"tools.altipla.consulting/cmd/configure-dev-machine/internal/version"
 )
 
 func init() {
@@ -14,13 +14,14 @@ func init() {
 
 var CmdVersion = &cobra.Command{
 	Use:   "version",
-	Short: "Versión actual del configurador",
+	Short: "Print current installed version and latest available one.",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		version, err := config.Version()
+		info, err := version.FetchInfo()
 		if err != nil {
 			return errors.Trace(err)
 		}
-		fmt.Println(version)
+		fmt.Println("Currently Installed:", info.CurrentlyInstalled)
+		fmt.Println("Latest:", info.Latest)
 		return nil
 	},
 }
