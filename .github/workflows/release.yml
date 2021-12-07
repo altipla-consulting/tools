@@ -132,8 +132,8 @@ jobs:
 
     - name: Build DEB packages
       run: |-
-        sed -i 's/REPLACE_VERSION/${{ steps.version.outputs.VERSION }}/g' deb/*.yml
         sed -i 's/REPLACE_VERSION_NUMONLY/${{ steps.version_numonly.outputs.VERSION }}/g' deb/*.yml
+        sed -i 's/REPLACE_VERSION/${{ steps.version.outputs.VERSION }}/g' deb/*.yml
         nfpm pkg --packager deb -f deb/all.yml
         nfpm pkg --packager deb -f deb/ci.yml
         nfpm pkg --packager deb -f deb/gaestage.yml
