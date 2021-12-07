@@ -23,5 +23,5 @@ func (ins *insUpdater) Install() error {
 }
 
 func (ins *insUpdater) BashRC() string {
-	return "configure-dev-machine check-updates"
+	return "/usr/local/bin/configure-dev-machine check-updates"
 }
