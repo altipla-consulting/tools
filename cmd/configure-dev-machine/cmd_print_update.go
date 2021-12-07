@@ -16,7 +16,7 @@ var CmdPrintUpdate = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		o := box.Box{}
 		o.AddLine("Run the following command to update:")
-		o.AddLine(aurora.Blue("apt update && apt install configure-dev-machine && configure-dev-machine install"))
+		o.AddLine(aurora.Blue("sudo apt update && sudo apt install configure-dev-machine && configure-dev-machine install"))
 		o.Render()
 
 		return nil

@@ -50,7 +50,7 @@ var CmdCheckUpdates = &cobra.Command{
 				o.AddLine("Update available ", aurora.Gray(18, info.CurrentlyInstalled), " → ", aurora.BrightGreen(info.Latest))
 				o.AddLine()
 				o.AddLine("Run the following command to update:")
-				o.AddLine(aurora.Blue("apt update && apt install configure-dev-machine && configure-dev-machine install"))
+				o.AddLine(aurora.Blue("sudo apt update && sudo apt install configure-dev-machine && configure-dev-machine install"))
 				o.Render()
 
 				return nil
