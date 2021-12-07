@@ -147,7 +147,7 @@ jobs:
     - name: Release DEB packages
       run: |-
         gcloud --quiet components install beta
-        gcloud beta artifacts apt upload acpublic --source=all_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --source=tools_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud beta artifacts apt upload acpublic --source=ci_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud beta artifacts apt upload acpublic --source=gaestage_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud beta artifacts apt upload acpublic --source=gendc_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
