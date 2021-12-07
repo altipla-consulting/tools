@@ -18,6 +18,7 @@ func (ins *insUpdater) Check() (*CheckResult, error) {
 
 func (ins *insUpdater) Install() error {
 	script := `
+		sudo mkdir -p /etc/configure-dev-machine
 		echo REPLACE_VERSION | sudo tee /etc/configure-dev-machine/installed-version
   `
 	return errors.Trace(run.Shell(script))
