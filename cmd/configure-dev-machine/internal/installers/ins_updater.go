@@ -2,6 +2,7 @@ package installers
 
 import (
 	"libs.altipla.consulting/errors"
+
 	"tools.altipla.consulting/cmd/configure-dev-machine/internal/run"
 )
 
@@ -12,7 +13,7 @@ func (ins *insUpdater) Name() string {
 }
 
 func (ins *insUpdater) Check() (*CheckResult, error) {
-	return nil, nil
+	return NeedsInstall, nil
 }
 
 func (ins *insUpdater) Install() error {

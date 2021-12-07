@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"libs.altipla.consulting/errors"
+
 	"tools.altipla.consulting/cmd/configure-dev-machine/internal/version"
 )
 

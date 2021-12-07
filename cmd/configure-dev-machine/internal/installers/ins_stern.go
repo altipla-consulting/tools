@@ -4,8 +4,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"libs.altipla.consulting/errors"
 	log "github.com/sirupsen/logrus"
+	"libs.altipla.consulting/errors"
 
 	"tools.altipla.consulting/cmd/configure-dev-machine/internal/run"
 )

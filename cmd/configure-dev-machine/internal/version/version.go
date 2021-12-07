@@ -6,8 +6,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"sort"
 	"time"
 
+	"github.com/Masterminds/semver"
 	"github.com/ebikt/go-debian/control"
 	"libs.altipla.consulting/errors"
 )
@@ -63,11 +65,20 @@ func getLatest() (string, error) {
 	if err != nil {
 		return "", errors.Trace(err)
 	}
+	var versions semver.Collection
 	for _, index := range indexes {
 		if index.Package == "configure-dev-machine" {
-			return index.Version.String(), nil
+			v, err := semver.NewVersion(index.Version.String())
+			if err != nil {
+				return "", errors.Trace(err)
+			}
+			versions = append(versions, v)
 		}
 	}
+	sort.Sort(sort.Reverse(versions))
 
+	if len(versions) > 0 {
+		return "v" + versions[0].String(), nil
+	}
 	return "~~unknown", nil
 }
