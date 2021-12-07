@@ -10,18 +10,18 @@ platform: linux
 section: default
 priority: extra
 depends:
-- ci
-- configure-dev-machine
-- gaestage
-- gendc
-- impsort
-- jnet
-- linter
-- previewer-netlify
-- pub
-- releaser
-- reloader
-- wave
+- ci (= REPLACE_VERSION_NUMONLY)
+- configure-dev-machine (= REPLACE_VERSION_NUMONLY)
+- gaestage (= REPLACE_VERSION_NUMONLY)
+- gendc (= REPLACE_VERSION_NUMONLY)
+- impsort (= REPLACE_VERSION_NUMONLY)
+- jnet (= REPLACE_VERSION_NUMONLY)
+- linter (= REPLACE_VERSION_NUMONLY)
+- previewer-netlify (= REPLACE_VERSION_NUMONLY)
+- pub (= REPLACE_VERSION_NUMONLY)
+- releaser (= REPLACE_VERSION_NUMONLY)
+- reloader (= REPLACE_VERSION_NUMONLY)
+- wave (= REPLACE_VERSION_NUMONLY)
 
 maintainer: Altipla Consulting <ernesto@altiplaconsulting.com>
 vendor: Altipla Consulting
