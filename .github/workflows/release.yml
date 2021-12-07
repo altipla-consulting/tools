@@ -16,6 +16,9 @@ jobs:
     - name: Get the version
       id: version
       run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+    - name: Get the version (numbers only)
+      id: version_numonly
+      run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/v}
 
     - name: Checkout code
       uses: actions/checkout@master
@@ -28,6 +31,11 @@ jobs:
       uses: google-github-actions/setup-gcloud@master
       with:
         project_id: altipla-tools
+    - name: Setup nfpm
+      run: |-
+        echo 'deb [trusted=yes] https://repo.goreleaser.com/apt/ /' | sudo tee /etc/apt/sources.list.d/goreleaser.list
+        sudo apt update
+        sudo apt install nfpm
 
     - name: Authenticate to Google Cloud
       id: auth
@@ -46,77 +54,66 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/ci
         name: ci
-
     - name: Release gaestage
       uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/gaestage
         name: gaestage
-
     - name: Release gendc
       uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/gendc
         name: gendc
-
     - name: Release impsort
       uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/impsort
         name: impsort
-
     - name: Release jnet
       uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/jnet
         name: jnet
-
     - name: Release linter
       uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/linter
         name: linter
-
     - name: Release previewer-netlify
       uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/previewer-netlify
         name: previewer-netlify
-
     - name: Release pub
       uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/pub
         name: pub
-
     - name: Release reloader
       uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/reloader
         name: reloader
-
     - name: Release wave
       uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/wave
         name: wave
-
     - name: Release releaser
       uses: altipla-consulting/go-release.actions@main
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/releaser
         name: releaser
-
     - name: Release configure-dev-machine
       uses: altipla-consulting/go-release.actions@main
       with:
@@ -129,3 +126,37 @@ jobs:
         gcloud --quiet components install alpha
         sed -i 's/REPLACE_VERSION/${{ steps.version.outputs.VERSION }}/g' install/configure-dev-machine
         gcloud alpha storage cp -R --cache-control 'public, max-age=10' install gs://tools.altipla.consulting
+
+    - name: Build DEB packages
+      run: |-
+        sed -i 's/REPLACE_VERSION/${{ steps.version.outputs.VERSION }}/g' deb/*.yaml
+        nfpm pkg --packager deb -f deb/all.yml
+        nfpm pkg --packager deb -f deb/ci.yml
+        nfpm pkg --packager deb -f deb/gaestage.yml
+        nfpm pkg --packager deb -f deb/gendc.yml
+        nfpm pkg --packager deb -f deb/impsort.yml
+        nfpm pkg --packager deb -f deb/jnet.yml
+        nfpm pkg --packager deb -f deb/linter.yml
+        nfpm pkg --packager deb -f deb/previewer-netlify.yml
+        nfpm pkg --packager deb -f deb/pub.yml
+        nfpm pkg --packager deb -f deb/reloader.yml
+        nfpm pkg --packager deb -f deb/wave.yml
+        nfpm pkg --packager deb -f deb/releaser.yml
+        nfpm pkg --packager deb -f deb/configure-dev-machine.yml
+  
+    - name: Release DEB packages
+      run: |-
+        gcloud --quiet components install beta
+        gcloud beta artifacts apt upload acpublic --source=all_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --source=ci_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --source=gaestage_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --source=gendc_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --source=impsort_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --source=jnet_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --source=linter_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --source=previewer-netlify_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --source=pub_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --source=reloader_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --source=wave_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --source=releaser_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --source=configure-dev-machine_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools

@@ -1,0 +1,22 @@
+
+name: jnet
+version: REPLACE_VERSION
+description: |
+  Internal tools for developers in Altipla Consulting.
+
+arch: amd64
+platform: linux
+
+section: default
+priority: extra
+provides:
+- jnet
+
+maintainer: Altipla Consulting <ernesto@altiplaconsulting.com>
+vendor: Altipla Consulting
+homepage: https://github.com/altipla-consulting/tools
+license: MIT
+
+contents:
+- src: ./jnet
+  dst: /usr/local/bin/jnet
