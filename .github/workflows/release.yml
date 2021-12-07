@@ -128,7 +128,6 @@ jobs:
     - name: Release install scripts
       run: |-
         gcloud --quiet components install alpha
-        sed -i 's/REPLACE_VERSION/${{ steps.version.outputs.VERSION }}/g' install/configure-dev-machine
         gcloud alpha storage cp -R --cache-control 'public, max-age=10' install gs://tools.altipla.consulting
 
     - name: Build DEB packages
