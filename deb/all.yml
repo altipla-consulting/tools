@@ -11,7 +11,7 @@ section: default
 priority: extra
 depends:
 - ci (= REPLACE_VERSION_NUMONLY)
-- configure-dev-machine (= REPLACE_VERSION_NUMONLY)
+- configure-dev-machine
 - gaestage (= REPLACE_VERSION_NUMONLY)
 - gendc (= REPLACE_VERSION_NUMONLY)
 - impsort (= REPLACE_VERSION_NUMONLY)
