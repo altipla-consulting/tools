@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/Masterminds/semver"
@@ -43,7 +44,7 @@ func getCurrentlyInstalled() (string, error) {
 		}
 		return "", errors.Trace(err)
 	}
-	return string(content), nil
+	return strings.TrimSpace(string(content)), nil
 }
 
 func getLatest() (string, error) {
