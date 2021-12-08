@@ -50,7 +50,7 @@ jobs:
 
     - name: Fill version info inside binaries
       run: |-
-        sed -i 's/REPLACE_VERSION/${{ steps.version.outputs.VERSION }}/g' cmd/configure-dev-machine/internal/installers/installer.go
+        sed -i 's/REPLACE_VERSION/${{ steps.version.outputs.VERSION }}/g' cmd/configure-dev-machine/internal/installers/ins_updater.go
 
     - name: Release ci
       uses: altipla-consulting/go-release.actions@main
