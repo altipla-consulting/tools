@@ -11,6 +11,7 @@ func init() {
 	CmdRoot.AddCommand(cmdMajor)
 	CmdRoot.AddCommand(cmdMinor)
 	CmdRoot.AddCommand(cmdPatch)
+	CmdRoot.AddCommand(cmdGHDraft)
 
 	CmdRoot.PersistentFlags().BoolVarP(&flagDebug, "debug", "d", false, "Enable debug logging for this tool")
 }
