@@ -33,7 +33,7 @@ func Release(update string) error {
 	if current == "" {
 		current = "v0.0.0"
 	}
-	components := strings.Split(current, ".")
+	components := strings.Split(strings.Split(current, "-")[0], ".")
 	major, err := strconv.ParseInt(components[0][1:], 10, 64)
 	if err != nil {
 		return errors.Trace(err)
