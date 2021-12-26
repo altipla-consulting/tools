@@ -10,7 +10,7 @@ import (
 	"tools.altipla.consulting/cmd/configure-dev-machine/internal/run"
 )
 
-const wantedNode = "12"
+const wantedNode = "16"
 
 type insNode struct{}
 
