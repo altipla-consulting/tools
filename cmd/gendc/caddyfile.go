@@ -32,4 +32,12 @@ var tmplCaddyfile = template.Must(template.New("caddyfile").Parse(
 	tls /opt/tls/cert.pem /opt/tls/key.pem
 }
 {{end}}
+
+:80 {
+	respond 404
+}
+
+:443 {
+	respond 404
+}
 `))
