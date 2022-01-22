@@ -19,7 +19,7 @@ func (ins *insGoprivate) Check() (*CheckResult, error) {
 func (ins *insGoprivate) Install() error {
 	script := `
 		git config --global url."ssh://git@github.com:".insteadOf "https://github.com"
-		/usr/local/go/bin/go env -w GOPRIVATE=github.com/lavozdealmeria,github.com/altipla-consulting
+		/usr/local/go/bin/go env -w GOPRIVATE=github.com/lavozdealmeria,github.com/altipla-consulting,go.buf.build
   `
 	return errors.Trace(run.Shell(script))
 }
