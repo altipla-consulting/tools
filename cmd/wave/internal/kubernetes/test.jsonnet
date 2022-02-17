@@ -23,6 +23,12 @@ local wave = import 'wave.jsonnet';
         wave.network.Port(name='different-port', port=8081, targetPort=8082),
     },
 
+    externalService: {
+      empty: wave.objects.ExternalService(name='foo-service', ip='1.2.3.4'),
+      selector: wave.objects.ExternalService(name='foo-service', ip='1.2.3.4') +
+        wave.features.CustomSelector(selector='foo-selector'),
+    },
+
     deployment: {
       empty: wave.objects.Deployment(name='foo-deployment'),
       singleContainer: wave.objects.Deployment(name='foo-deployment') +

@@ -277,6 +277,38 @@
         "name": "foo-service"
       },
       "spec": {
+        "externalTrafficPolicy": "Local",
+        "loadBalancerIP": "1.2.3.4",
+        "ports": [],
+        "selector": {
+          "app": "foo-service"
+        },
+        "type": "LoadBalancer"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "foo-service"
+      },
+      "spec": {
+        "externalTrafficPolicy": "Local",
+        "loadBalancerIP": "1.2.3.4",
+        "ports": [],
+        "selector": {
+          "app": "foo-selector"
+        },
+        "type": "LoadBalancer"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "foo-service"
+      },
+      "spec": {
         "clusterIP": "None",
         "ports": [],
         "selector": {

@@ -65,6 +65,19 @@
         clusterIP: 'None'
       },
     },
+
+    ExternalService: function(name, ip) {
+      apiVersion: 'v1',
+      kind: 'Service',
+      metadata: {name: name},
+      spec: {
+        selector: {app: name},
+        ports: [],
+        type: 'LoadBalancer',
+        loadBalancerIP: ip,
+        externalTrafficPolicy: 'Local',
+      },
+    },
   },
 
   network: {
@@ -169,6 +182,14 @@
           httpGet: {path: '/health', port: port},
           timeoutSeconds: 5,
           initialDelaySeconds: 10,
+        },
+      },
+    },
+
+    CustomSelector: function(selector) {
+      spec+: {
+        selector+: {
+          app: selector,
         },
       },
     },
