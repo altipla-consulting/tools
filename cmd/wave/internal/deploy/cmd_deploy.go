@@ -26,7 +26,7 @@ var (
 
 func init() {
 	Cmd.PersistentFlags().StringVar(&flagProject, "project", "", "Google Cloud project where the container will be stored. Defaults to the GOOGLE_PROJECT environment variable.")
-	Cmd.PersistentFlags().StringVar(&flagMemory, "memory", "256Mi", "Memory available inside the Cloud Run application.")
+	Cmd.PersistentFlags().StringVar(&flagMemory, "memory", "", "Memory available inside the Cloud Run application. Default: 256Mi.")
 	Cmd.PersistentFlags().StringVar(&flagServiceAccount, "service-account", "", "Service account. Defaults to one with the name of the application.")
 	Cmd.PersistentFlags().StringVar(&flagSentry, "sentry", "", "Name of the sentry project to configure.")
 	Cmd.PersistentFlags().StringSliceVar(&flagVolumeSecret, "volume-secret", nil, "Secrets to mount as volumes.")
@@ -50,6 +50,13 @@ var Cmd = &cobra.Command{
 		}
 		if flagServiceAccount == "" {
 			flagServiceAccount = app
+		}
+		if flagMemory == "" {
+			if flagAlwaysOn {
+				flagMemory = "512Mi"
+			} else {
+				flagMemory = "256Mi"
+			}
 		}
 
 		client, err := sentry.NewClient(os.Getenv("SENTRY_AUTH_TOKEN"), nil, nil)
