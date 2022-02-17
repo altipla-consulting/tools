@@ -13,28 +13,28 @@ import (
 	"libs.altipla.consulting/errors"
 )
 
-type cmdFlags struct {
-	Project        string
-	Memory         string
-	ServiceAccount string
-	Sentry         string
-	VolumeSecret   []string
-	EnvSecret      []string
-	Tag            string
-}
-
 var (
-	flags cmdFlags
+	flagProject        string
+	flagMemory         string
+	flagServiceAccount string
+	flagSentry         string
+	flagVolumeSecret   []string
+	flagEnvSecret      []string
+	flagTag            string
+	flagAlwaysOn       bool
 )
 
 func init() {
-	Cmd.PersistentFlags().StringVar(&flags.Project, "project", "", "Google Cloud project where the container will be stored. Defaults to the GOOGLE_PROJECT environment variable.")
-	Cmd.PersistentFlags().StringVar(&flags.Memory, "memory", "256Mi", "Memory available inside the Cloud Run application.")
-	Cmd.PersistentFlags().StringVar(&flags.ServiceAccount, "service-account", "", "Service account. Defaults to one with the name of the application.")
-	Cmd.PersistentFlags().StringVar(&flags.Sentry, "sentry", "", "Sentry project to configure.")
-	Cmd.PersistentFlags().StringSliceVar(&flags.VolumeSecret, "volume-secret", nil, "Secrets to mount as volumes.")
-	Cmd.PersistentFlags().StringSliceVar(&flags.EnvSecret, "env-secret", nil, "Secrets to mount as environment variables.")
-	Cmd.PersistentFlags().StringVar(&flags.Tag, "tag", "", "Name of the revision included in the URL. Defaults to the Gerrit change and patchset.")
+	Cmd.PersistentFlags().StringVar(&flagProject, "project", "", "Google Cloud project where the container will be stored. Defaults to the GOOGLE_PROJECT environment variable.")
+	Cmd.PersistentFlags().StringVar(&flagMemory, "memory", "256Mi", "Memory available inside the Cloud Run application.")
+	Cmd.PersistentFlags().StringVar(&flagServiceAccount, "service-account", "", "Service account. Defaults to one with the name of the application.")
+	Cmd.PersistentFlags().StringVar(&flagSentry, "sentry", "", "Name of the sentry project to configure.")
+	Cmd.PersistentFlags().StringSliceVar(&flagVolumeSecret, "volume-secret", nil, "Secrets to mount as volumes.")
+	Cmd.PersistentFlags().StringSliceVar(&flagEnvSecret, "env-secret", nil, "Secrets to mount as environment variables.")
+	Cmd.PersistentFlags().StringVar(&flagTag, "tag", "", "Name of the revision included in the URL. Defaults to the Gerrit change and patchset.")
+	Cmd.PersistentFlags().BoolVar(&flagAlwaysOn, "always-on", false, "App will always have CPU even if it's in the background without requests.")
+
+	Cmd.MarkPersistentFlagRequired("sentry")
 }
 
 var Cmd = &cobra.Command{
@@ -45,14 +45,11 @@ var Cmd = &cobra.Command{
 	RunE: func(command *cobra.Command, args []string) error {
 		app := args[0]
 
-		if flags.Project == "" {
-			flags.Project = os.Getenv("GOOGLE_PROJECT")
+		if flagProject == "" {
+			flagProject = os.Getenv("GOOGLE_PROJECT")
 		}
-		if flags.Sentry == "" {
-			return errors.Errorf("--sentry flag is required")
-		}
-		if flags.ServiceAccount == "" {
-			flags.ServiceAccount = app
+		if flagServiceAccount == "" {
+			flagServiceAccount = app
 		}
 
 		client, err := sentry.NewClient(os.Getenv("SENTRY_AUTH_TOKEN"), nil, nil)
@@ -63,7 +60,7 @@ var Cmd = &cobra.Command{
 		org := sentry.Organization{
 			Slug: apiString("altipla-consulting"),
 		}
-		keys, err := client.GetClientKeys(org, sentry.Project{Slug: apiString(flags.Sentry)})
+		keys, err := client.GetClientKeys(org, sentry.Project{Slug: apiString(flagSentry)})
 		if err != nil {
 			return errors.Trace(err)
 		}
@@ -74,53 +71,56 @@ var Cmd = &cobra.Command{
 		}
 		if os.Getenv("BUILD_CAUSE") == "SCMTRIGGER" {
 			version += ".preview"
-			if flags.Tag == "" {
-				flags.Tag = "preview-" + os.Getenv("GERRIT_CHANGE_NUMBER") + "-" + os.Getenv("GERRIT_PATCHSET_NUMBER")
+			if flagTag == "" {
+				flagTag = "preview-" + os.Getenv("GERRIT_CHANGE_NUMBER") + "-" + os.Getenv("GERRIT_PATCHSET_NUMBER")
 			}
 		}
 
 		log.WithFields(log.Fields{
 			"name":            app,
 			"version":         version,
-			"memory":          flags.Memory,
-			"service-account": flags.ServiceAccount,
+			"memory":          flagMemory,
+			"service-account": flagServiceAccount,
 		}).Info("Deploy app")
 
 		gcloud := []string{
 			"beta", "run", "deploy",
 			app,
-			"--image", "eu.gcr.io/" + flags.Project + "/" + app + ":" + version,
+			"--image", "eu.gcr.io/" + flagProject + "/" + app + ":" + version,
 			"--region", "europe-west1",
 			"--platform", "managed",
 			"--concurrency", "50",
 			"--timeout", "60s",
-			"--service-account", flags.ServiceAccount + "@" + flags.Project + ".iam.gserviceaccount.com",
-			"--memory", flags.Memory,
+			"--service-account", flagServiceAccount + "@" + flagProject + ".iam.gserviceaccount.com",
+			"--memory", flagMemory,
 			"--set-env-vars", "SENTRY_DSN=" + keys[0].DSN.Public,
 			"--labels", "app=" + app,
 		}
-		if len(flags.VolumeSecret) > 0 || len(flags.EnvSecret) > 0 {
+		if len(flagVolumeSecret) > 0 || len(flagEnvSecret) > 0 {
 			var secrets []string
-			for _, secret := range flags.VolumeSecret {
+			for _, secret := range flagVolumeSecret {
 				if secret == "ravendb-client-credentials" {
 					secrets = append(secrets, "/etc/secrets/"+secret+"="+secret+":latest")
 				}
 				secrets = append(secrets, "/etc/secrets-v2/"+secret+"/value="+secret+":latest")
 			}
-			for _, secret := range flags.EnvSecret {
+			for _, secret := range flagEnvSecret {
 				varname := strings.Replace(strings.ToUpper(secret), "-", "_", -1)
 				secrets = append(secrets, varname+"="+secret+":latest")
 			}
 			gcloud = append(gcloud, "--set-secrets", strings.Join(secrets, ","))
 		}
-		if flags.Tag != "" {
+		if flagTag != "" {
 			if os.Getenv("BUILD_CAUSE") == "SCMTRIGGER" {
 				gcloud = append(gcloud, "--no-traffic")
 				gcloud = append(gcloud, "--max-instances", "1")
 			}
-			gcloud = append(gcloud, "--tag", flags.Tag)
+			gcloud = append(gcloud, "--tag", flagTag)
 		} else {
 			gcloud = append(gcloud, "--max-instances", "20")
+		}
+		if flagAlwaysOn {
+			gcloud = append(gcloud, "--no-cpu-throttling")
 		}
 
 		log.Debug(strings.Join(append([]string{"gcloud"}, gcloud...), " "))
@@ -142,7 +142,7 @@ var Cmd = &cobra.Command{
 				"gcloud",
 				"run", "services", "update-traffic",
 				app,
-				"--project", flags.Project,
+				"--project", flagProject,
 				"--region", "europe-west1",
 				"--to-latest",
 			)
