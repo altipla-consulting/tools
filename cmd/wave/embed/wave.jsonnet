@@ -3,24 +3,52 @@
 
   objects: {
     Deployment: function(name) {
-      apiVersion: 'apps/v1',
-      kind: 'Deployment',
-      metadata: {name: name},
-      spec: {
-        replicas: 1,
-        revisionHistoryLimit: 10,
-        strategy: {
-          rollingUpdate: {maxUnavailable: 0},
-        },
-        selector: {
-          matchLabels: {app: name},
-        },
-        template: {
-          metadata: {
-            labels: {app: name},
+      deployment: {
+        apiVersion: 'apps/v1',
+        kind: 'Deployment',
+        metadata: {name: name},
+        spec: {
+          replicas: 1,
+          revisionHistoryLimit: 10,
+          strategy: {
+            rollingUpdate: {maxUnavailable: 0},
           },
-          spec: {
-            containers: [],
+          selector: {
+            matchLabels: {app: name},
+          },
+          template: {
+            metadata: {
+              labels: {app: name},
+            },
+            spec: {
+              containers: [],
+            },
+          },
+        },
+      },
+    },
+
+    StatefulSet: function(name) {
+      statefulset: {
+        apiVersion: 'apps/v1',
+        kind: 'StatefulSet',
+        metadata: {name: name},
+        spec: {
+          selector: {
+            matchLabels: {app: name},
+          },
+          serviceName: name,
+          updateStrategy: {
+            type: 'RollingUpdate',
+          },
+          template: {
+            metadata: {
+              labels: {app: name},
+            },
+            spec: {
+              containers: [],
+              volumes: [],
+            },
           },
         },
       },
@@ -33,6 +61,7 @@
       env: [
         {name: 'VERSION', value: std.extVar('version')},
       ],
+      volumeMounts: [],
     },
 
     ServiceAccount: function(name) {
@@ -147,11 +176,13 @@
     },
 
     AzureBind: function(name) {
-      spec+: {
-        template+: {
-          metadata+: {
-            labels+: {
-              aadpodidbinding: name,
+      deployment+: {
+        spec+: {
+          template+: {
+            metadata+: {
+              labels+: {
+                aadpodidbinding: name,
+              },
             },
           },
         },
@@ -197,10 +228,24 @@
 
   spec: {
     DeploymentContainer: function(container) {
-      spec+: {
-        template+: {
-          spec+: {
-            containers+: [container],
+      deployment+: {
+        spec+: {
+          template+: {
+            spec+: {
+              containers+: [container],
+            },
+          },
+        },
+      },
+    },
+
+    StatefulSetContainer: function(container) {
+      statefulset+: {
+        spec+: {
+          template+: {
+            spec+: {
+              containers+: [container],
+            },
           },
         },
       },
@@ -213,6 +258,37 @@
         requests: {cpu: cpu, memory: memory},
         limits: {memory: memory},
       },
+    },
+  },
+
+  volumes: {
+    Google: function(name, disk) {
+      statefulset+: {
+        spec+: {
+          template+: {
+            spec+: {
+              volumes+: [
+                {
+                  name: name,
+                  gcePersistentDisk: {
+                    pdName: disk,
+                    fsType: 'ext4',
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
+
+    Mount: function(name, path) {
+      volumeMounts+: [
+        {
+          name: name,
+          mountPath: path,
+        },
+      ],
     },
   },
 }

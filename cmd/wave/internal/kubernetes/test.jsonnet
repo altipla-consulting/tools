@@ -54,5 +54,19 @@ local wave = import 'wave.jsonnet';
       azureBind: wave.objects.Deployment(name='foo-deployment') +
         wave.identities.AzureBind(name='foo-identity'),
     },
+
+    statefulset: {
+      empty: wave.objects.StatefulSet(name='foo-statefulset'),
+      singleContainer: wave.objects.StatefulSet(name='foo-statefulset') +
+        wave.spec.StatefulSetContainer(
+          wave.objects.Container('foo-container', wave.env.Version('eu.gcr.io/foo')),
+        ),
+      volumes: wave.objects.StatefulSet(name='foo-statefulset') +
+        wave.spec.StatefulSetContainer(
+          wave.objects.Container('foo-container', wave.env.Version('eu.gcr.io/foo')) +
+            wave.volumes.Mount(name='foo-volume', path='/etc/path'),
+        ) +
+        wave.volumes.Google(name='foo-volume', disk='foo-disk'),
+    },
   },
 }

@@ -166,7 +166,8 @@
                     "cpu": "2m",
                     "memory": "256Mi"
                   }
-                }
+                },
+                "volumeMounts": []
               }
             ]
           }
@@ -209,7 +210,8 @@
                 ],
                 "image": "eu.gcr.io/foo:20220217.",
                 "name": "foo-container",
-                "ports": []
+                "ports": [],
+                "volumeMounts": []
               },
               {
                 "env": [
@@ -220,7 +222,8 @@
                 ],
                 "image": "eu.gcr.io/bar",
                 "name": "bar-container",
-                "ports": []
+                "ports": [],
+                "volumeMounts": []
               }
             ]
           }
@@ -263,7 +266,8 @@
                 ],
                 "image": "eu.gcr.io/foo:20220217.",
                 "name": "foo-container",
-                "ports": []
+                "ports": [],
+                "volumeMounts": []
               }
             ]
           }
@@ -383,6 +387,132 @@
       "kind": "ServiceAccount",
       "metadata": {
         "name": "foo-service-account"
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "StatefulSet",
+      "metadata": {
+        "name": "foo-statefulset"
+      },
+      "spec": {
+        "selector": {
+          "matchLabels": {
+            "app": "foo-statefulset"
+          }
+        },
+        "serviceName": "foo-statefulset",
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "foo-statefulset"
+            }
+          },
+          "spec": {
+            "containers": [],
+            "volumes": []
+          }
+        },
+        "updateStrategy": {
+          "type": "RollingUpdate"
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "StatefulSet",
+      "metadata": {
+        "name": "foo-statefulset"
+      },
+      "spec": {
+        "selector": {
+          "matchLabels": {
+            "app": "foo-statefulset"
+          }
+        },
+        "serviceName": "foo-statefulset",
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "foo-statefulset"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "env": [
+                  {
+                    "name": "VERSION",
+                    "value": "20220217."
+                  }
+                ],
+                "image": "eu.gcr.io/foo:20220217.",
+                "name": "foo-container",
+                "ports": [],
+                "volumeMounts": []
+              }
+            ],
+            "volumes": []
+          }
+        },
+        "updateStrategy": {
+          "type": "RollingUpdate"
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "StatefulSet",
+      "metadata": {
+        "name": "foo-statefulset"
+      },
+      "spec": {
+        "selector": {
+          "matchLabels": {
+            "app": "foo-statefulset"
+          }
+        },
+        "serviceName": "foo-statefulset",
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "foo-statefulset"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "env": [
+                  {
+                    "name": "VERSION",
+                    "value": "20220217."
+                  }
+                ],
+                "image": "eu.gcr.io/foo:20220217.",
+                "name": "foo-container",
+                "ports": [],
+                "volumeMounts": [
+                  {
+                    "mountPath": "/etc/path",
+                    "name": "foo-volume"
+                  }
+                ]
+              }
+            ],
+            "volumes": [
+              {
+                "gcePersistentDisk": {
+                  "fsType": "ext4",
+                  "pdName": "foo-disk"
+                },
+                "name": "foo-volume"
+              }
+            ]
+          }
+        },
+        "updateStrategy": {
+          "type": "RollingUpdate"
+        }
       }
     }
   ]
