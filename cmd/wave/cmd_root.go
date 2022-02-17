@@ -6,6 +6,7 @@ import (
 
 	"tools.altipla.consulting/cmd/wave/internal/build"
 	"tools.altipla.consulting/cmd/wave/internal/deploy"
+	"tools.altipla.consulting/cmd/wave/internal/kubernetes"
 	"tools.altipla.consulting/cmd/wave/internal/netlify"
 	"tools.altipla.consulting/cmd/wave/internal/preview"
 )
@@ -18,6 +19,7 @@ func init() {
 	cmdRoot.AddCommand(deploy.Cmd)
 	cmdRoot.AddCommand(netlify.Cmd)
 	cmdRoot.AddCommand(preview.Cmd)
+	cmdRoot.AddCommand(kubernetes.Cmd)
 }
 
 var cmdRoot = &cobra.Command{

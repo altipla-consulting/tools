@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"libs.altipla.consulting/errors"
+
 	"tools.altipla.consulting/cmd/releaser/internal/git"
 	"tools.altipla.consulting/cmd/releaser/internal/run"
 )

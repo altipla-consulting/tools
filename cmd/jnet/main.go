@@ -15,13 +15,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 	"libs.altipla.consulting/errors"
-)
 
-var lib = []byte(`
-{
-  imageVersion:: std.native('imageVersion'),
-}
-`)
+	"tools.altipla.consulting/cmd/jnet/embed"
+)
 
 func main() {
 	if err := run(); err != nil {
@@ -40,7 +36,7 @@ func run() error {
 	}
 	defer os.RemoveAll(dir)
 
-	if err := ioutil.WriteFile(filepath.Join(dir, "jnet.jsonnet"), lib, 0600); err != nil {
+	if err := ioutil.WriteFile(filepath.Join(dir, "jnet.jsonnet"), embed.NativeFuncs, 0600); err != nil {
 		return errors.Trace(err)
 	}
 

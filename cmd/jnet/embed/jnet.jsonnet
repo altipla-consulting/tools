@@ -1,0 +1,3 @@
+{
+  imageVersion:: std.native('imageVersion'),
+}
