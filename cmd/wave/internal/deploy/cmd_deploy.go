@@ -128,6 +128,8 @@ var Cmd = &cobra.Command{
 		}
 		if flagAlwaysOn {
 			gcloud = append(gcloud, "--no-cpu-throttling")
+		} else {
+			gcloud = append(gcloud, "--cpu-throttling")
 		}
 
 		log.Debug(strings.Join(append([]string{"gcloud"}, gcloud...), " "))
