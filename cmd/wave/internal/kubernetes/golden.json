@@ -52,7 +52,8 @@
             }
           },
           "spec": {
-            "containers": []
+            "containers": [],
+            "volumes": []
           }
         }
       }
@@ -83,7 +84,8 @@
             }
           },
           "spec": {
-            "containers": []
+            "containers": [],
+            "volumes": []
           }
         }
       }
@@ -173,10 +175,88 @@
                 },
                 "volumeMounts": []
               }
+            ],
+            "volumes": []
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "foo-deployment"
+      },
+      "spec": {
+        "replicas": 1,
+        "revisionHistoryLimit": 10,
+        "selector": {
+          "matchLabels": {
+            "app": "foo-deployment"
+          }
+        },
+        "strategy": {
+          "rollingUpdate": {
+            "maxUnavailable": 0
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "foo-deployment"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "env": [
+                  {
+                    "name": "VERSION",
+                    "value": "foo-version"
+                  },
+                  {
+                    "name": "K_SERVICE",
+                    "value": "foo-container"
+                  },
+                  {
+                    "name": "GOOGLE_APPLICATION_CREDENTIALS",
+                    "value": "/etc/identity/service-account.json"
+                  }
+                ],
+                "image": "eu.gcr.io/foo",
+                "name": "foo-container",
+                "ports": [],
+                "volumeMounts": [
+                  {
+                    "mountPath": "/etc/identity",
+                    "name": "google-identity",
+                    "readOnly": true
+                  }
+                ]
+              }
+            ],
+            "volumes": [
+              {
+                "name": "google-identity",
+                "secret": {
+                  "secretName": "foo-deployment-identity"
+                }
+              }
             ]
           }
         }
       }
+    },
+    {
+      "apiVersion": "v1",
+      "data": {
+        "trigger": "YXV0by1pZGVudGl0eQ=="
+      },
+      "kind": "Secret",
+      "metadata": {
+        "name": "foo-deployment-identity"
+      },
+      "type": "Opaque"
     },
     {
       "apiVersion": "apps/v1",
@@ -237,7 +317,8 @@
                 "ports": [],
                 "volumeMounts": []
               }
-            ]
+            ],
+            "volumes": []
           }
         }
       }
@@ -285,7 +366,8 @@
                 "ports": [],
                 "volumeMounts": []
               }
-            ]
+            ],
+            "volumes": []
           }
         }
       }

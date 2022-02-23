@@ -53,6 +53,12 @@ local wave = import 'wave.jsonnet';
         ),
       azureBind: wave.objects.Deployment(name='foo-deployment') +
         wave.identities.AzureBind(name='foo-identity'),
+      googleBind: wave.objects.Deployment(name='foo-deployment') +
+        wave.spec.DeploymentContainer(
+          wave.objects.Container('foo-container', 'eu.gcr.io/foo') +
+          wave.identities.GoogleBind()
+        ) +
+        wave.identities.Google(name='foo-deployment'),
     },
 
     statefulset: {

@@ -22,6 +22,7 @@
             },
             spec: {
               containers: [],
+              volumes: [],
             },
           },
         },
@@ -188,6 +189,51 @@
           },
         },
       },
+    },
+
+    Google: function(name) {
+      deployment+: {
+        spec+: {
+          template+: {
+            spec+: {
+              volumes+: [
+                {
+                  name: 'google-identity',
+                  secret: {
+                    secretName: name + '-identity',
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+
+      identitySecret: {
+        apiVersion: 'v1',
+        kind: 'Secret',
+        metadata: {name: name + '-identity'},
+        type: 'Opaque',
+        data: {
+          trigger: std.base64('auto-identity'),
+        },
+      },
+    },
+
+    GoogleBind: function() {
+      env+: [
+        {
+          name: 'GOOGLE_APPLICATION_CREDENTIALS',
+          value: '/etc/identity/service-account.json',
+        },
+      ],
+      volumeMounts+: [
+        {
+          name: 'google-identity',
+          mountPath: '/etc/identity',
+          readOnly: true,
+        },
+      ],
     },
   },
 
