@@ -60,6 +60,7 @@
       ports: [],
       env: [
         {name: 'VERSION', value: std.extVar('version')},
+        {name: 'K_SERVICE', value: name},
       ],
       volumeMounts: [],
     },
@@ -203,7 +204,7 @@
     },
 
     healthchecks: {
-      HTTP: function(port=8080) {
+      HTTP: function(port=8000) {
         livenessProbe: {
           httpGet: {path: '/health', port: port},
           timeoutSeconds: 5,
