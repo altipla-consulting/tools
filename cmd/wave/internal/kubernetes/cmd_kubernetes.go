@@ -48,7 +48,15 @@ var Cmd = &cobra.Command{
 			return errors.Trace(err)
 		}
 
-		result, err := runScript(args[0], content)
+		sentryClient, err := sentry.NewClient(os.Getenv("SENTRY_AUTH_TOKEN"), nil, nil)
+		if err != nil {
+			return errors.Trace(err)
+		}
+		nativeFuncs := []*jsonnet.NativeFunction{
+			nativeFuncSentry(sentryClient),
+		}
+
+		result, err := runScript(args[0], content, nativeFuncs)
 		if err != nil {
 			return errors.Trace(err)
 		}
@@ -75,12 +83,7 @@ var Cmd = &cobra.Command{
 	},
 }
 
-func runScript(filename string, content []byte) (*bytes.Buffer, error) {
-	sentryClient, err := sentry.NewClient(os.Getenv("SENTRY_AUTH_TOKEN"), nil, nil)
-	if err != nil {
-		return nil, errors.Trace(err)
-	}
-
+func runScript(filename string, content []byte, nativeFuncs []*jsonnet.NativeFunction) (*bytes.Buffer, error) {
 	dir, err := ioutil.TempDir("", "wave")
 	if err != nil {
 		return nil, errors.Trace(err)
@@ -94,7 +97,9 @@ func runScript(filename string, content []byte) (*bytes.Buffer, error) {
 	vm.Importer(&jsonnet.FileImporter{
 		JPaths: append(flagIncludes, ".", dir),
 	})
-	vm.NativeFunction(nativeFuncSentry(sentryClient))
+	for _, f := range nativeFuncs {
+		vm.NativeFunction(f)
+	}
 
 	vm.ExtVar("version", getVersion())
 

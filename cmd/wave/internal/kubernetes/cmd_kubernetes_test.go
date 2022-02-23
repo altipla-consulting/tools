@@ -6,6 +6,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/google/go-jsonnet"
+	"github.com/google/go-jsonnet/ast"
 	"github.com/stretchr/testify/require"
 )
 
@@ -15,7 +17,16 @@ func TestScript(t *testing.T) {
 	content, err := ioutil.ReadFile("test.jsonnet")
 	require.NoError(t, err)
 
-	buf, err := runScript("test", content)
+	nativeFuncs := []*jsonnet.NativeFunction{
+		{
+			Name:   "sentry",
+			Params: []ast.Identifier{"name"},
+			Func: func(args []interface{}) (interface{}, error) {
+				return args[0].(string) + "-dsn", nil
+			},
+		},
+	}
+	buf, err := runScript("test", content, nativeFuncs)
 	require.NoError(t, err)
 
 	fmt.Println(buf.String())

@@ -75,4 +75,12 @@ local wave = import 'wave.jsonnet';
         wave.volumes.Google(name='foo-volume', disk='foo-disk'),
     },
   },
+
+  features: {
+    Sentry: wave.objects.Deployment(name='foo-sentry') +
+      wave.spec.DeploymentContainer(
+        wave.objects.Container('foo-container', 'eu.gcr.io/foo') +
+        wave.features.Sentry('foo-sentry-project')
+      )
+  },
 }

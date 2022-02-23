@@ -1,6 +1,4 @@
 {
-  sentry:: std.native('sentry'),
-
   objects: {
     Deployment: function(name) {
       deployment: {
@@ -270,6 +268,15 @@
           app: selector,
         },
       },
+    },
+
+    Sentry: function(name) {
+      env+: [
+        {
+          name: 'SENTRY_DSN',
+          value: std.native('sentry')(name),
+        },
+      ],
     },
   },
 

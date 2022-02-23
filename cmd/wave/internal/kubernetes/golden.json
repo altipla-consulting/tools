@@ -3,6 +3,59 @@
   "kind": "List",
   "items": [
     {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "foo-sentry"
+      },
+      "spec": {
+        "replicas": 1,
+        "revisionHistoryLimit": 10,
+        "selector": {
+          "matchLabels": {
+            "app": "foo-sentry"
+          }
+        },
+        "strategy": {
+          "rollingUpdate": {
+            "maxUnavailable": 0
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "foo-sentry"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "env": [
+                  {
+                    "name": "VERSION",
+                    "value": "foo-version"
+                  },
+                  {
+                    "name": "K_SERVICE",
+                    "value": "foo-container"
+                  },
+                  {
+                    "name": "SENTRY_DSN",
+                    "value": "foo-sentry-project-dsn"
+                  }
+                ],
+                "image": "eu.gcr.io/foo",
+                "name": "foo-container",
+                "ports": [],
+                "volumeMounts": []
+              }
+            ],
+            "volumes": []
+          }
+        }
+      }
+    },
+    {
       "apiVersion": "aadpodidentity.k8s.io/v1",
       "kind": "AzureIdentityBinding",
       "metadata": {
