@@ -408,7 +408,7 @@
       "apiVersion": "v1",
       "kind": "Service",
       "metadata": {
-        "name": "foo-service"
+        "name": "foo-service-headless"
       },
       "spec": {
         "clusterIP": "None",
@@ -422,7 +422,7 @@
       "apiVersion": "v1",
       "kind": "Service",
       "metadata": {
-        "name": "foo-service"
+        "name": "foo-service-headless"
       },
       "spec": {
         "clusterIP": "None",

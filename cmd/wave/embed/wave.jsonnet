@@ -88,7 +88,7 @@
       apiVersion: 'v1',
       kind: 'Service',
       metadata: {
-        name: name,
+        name: name + '-headless',
       },
       spec: {
         selector: {app: name},
