@@ -152,7 +152,7 @@ func writeDockerCompose(settings *configFile) error {
 
 		dc.Services[app.Name] = &dcService{
 			Image:   "eu.gcr.io/altipla-tools/go:latest",
-			Command: []string{"reloader", "run", ".", "-r", "-e", ".pbtext,.yml,.yaml", "-w", "../pkg", "-w", "../internal", "-w", "../protos"},
+			Command: []string{"/usr/local/bin/reloader", "run", ".", "-r", "-e", ".pbtext,.yml,.yaml", "-w", "../pkg", "-w", "../internal", "-w", "../protos"},
 			Env:     env,
 			Volumes: []string{
 				sshAuthSockEnv + ":" + sshAuthSockEnv,
