@@ -78,7 +78,7 @@ func createCerts() error {
 	}
 
 	log.Info("Generating new local HTTPS certificates")
-	gen := exec.Command("mkcert", "-cert-file", "tmp/gendc/cert.pem", "-key-file", "tmp/gendc/key.pem", "*.dev.localhost")
+	gen := exec.Command("mkcert", "-cert-file", "tmp/gendc/cert.pem", "-key-file", "tmp/gendc/key.pem", "*.dev.localhost", "*.dev.remote")
 	gen.Stdout = os.Stdout
 	gen.Stderr = os.Stderr
 	if err := gen.Run(); err != nil {
