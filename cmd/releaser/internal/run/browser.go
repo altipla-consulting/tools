@@ -1,6 +1,7 @@
 package run
 
 import (
+	"os"
 	"os/exec"
 
 	"libs.altipla.consulting/errors"
@@ -17,5 +18,9 @@ func OpenBrowser(url string) error {
 
 		return errors.Trace(err)
 	}
-	return errors.Trace(exec.Command("xdg-open", url).Start())
+	cmd := exec.Command("xdg-open", url)
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+	return errors.Trace(cmd.Start())
 }
