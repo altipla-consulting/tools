@@ -183,6 +183,10 @@ func Release(update string) error {
 					qs.Set("body", notes)
 					u.RawQuery = qs.Encode()
 					if err := run.OpenBrowser(u.String()); err != nil {
+						if errors.Is(err, run.ErrCannotOpenBrowser) {
+							return nil
+						}
+
 						return errors.Trace(err)
 					}
 

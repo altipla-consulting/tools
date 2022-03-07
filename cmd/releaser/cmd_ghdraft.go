@@ -4,6 +4,7 @@ import (
 	"net/url"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"libs.altipla.consulting/errors"
 
@@ -42,6 +43,12 @@ var cmdGHDraft = &cobra.Command{
 		qs.Set("body", notes)
 		u.RawQuery = qs.Encode()
 		if err := run.OpenBrowser(u.String()); err != nil {
+			if errors.Is(err, run.ErrCannotOpenBrowser) {
+				log.Info("Open the following URL in your browser:")
+				log.Info(u.String())
+				return nil
+			}
+
 			return errors.Trace(err)
 		}
 
