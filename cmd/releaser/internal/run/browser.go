@@ -9,7 +9,8 @@ import (
 
 func OpenBrowser(url string) error {
 	if _, err := exec.LookPath("xdg-open"); err != nil {
-		if errors.Is(err, exec.ErrNotFound) {
+		var ee *exec.Error
+		if errors.As(err, &ee) && errors.Is(ee.Err, exec.ErrNotFound) {
 			log.Println("Open the following URL in your browser:")
 			log.Println("\t" + url)
 			return nil
