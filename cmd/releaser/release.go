@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/url"
 	"os"
@@ -71,14 +70,14 @@ func Release(update string) error {
 				Tasks: []*tasks.Task{
 					{
 						Message: "Check git remote",
-						Handler: func(w io.Writer) error {
+						Handler: func(ctrl *tasks.Controller) error {
 							_, err := run.Git("ls-remote", "origin", "HEAD")
 							return errors.Trace(err)
 						},
 					},
 					{
 						Message: "Check main branch",
-						Handler: func(w io.Writer) error {
+						Handler: func(ctrl *tasks.Controller) error {
 							branch, err := git.CurrentBranch()
 							if err != nil {
 								return errors.Trace(err)
@@ -91,7 +90,7 @@ func Release(update string) error {
 					},
 					{
 						Message: "Check local working tree",
-						Handler: func(w io.Writer) error {
+						Handler: func(ctrl *tasks.Controller) error {
 							dirty, err := git.DirtyWorkingTree()
 							if err != nil {
 								return errors.Trace(err)
@@ -104,7 +103,7 @@ func Release(update string) error {
 					},
 					{
 						Message: "Check remote history",
-						Handler: func(w io.Writer) error {
+						Handler: func(ctrl *tasks.Controller) error {
 							clean, err := git.RemoteHistoryClean()
 							if err != nil {
 								return errors.Trace(err)
@@ -117,8 +116,8 @@ func Release(update string) error {
 					},
 					{
 						Message: "Check git tag existence",
-						Handler: func(w io.Writer) error {
-							_, err := run.GitCapture(w, "fetch")
+						Handler: func(ctrl *tasks.Controller) error {
+							_, err := run.GitCapture(ctrl, "fetch")
 							if err != nil {
 								return errors.Trace(err)
 							}
@@ -141,22 +140,22 @@ func Release(update string) error {
 				Tasks: []*tasks.Task{
 					{
 						Message: "Commit new tag",
-						Handler: func(w io.Writer) error {
-							_, err := run.GitCapture(w, "commit", "--allow-empty", "-m", release[1:])
+						Handler: func(ctrl *tasks.Controller) error {
+							_, err := run.GitCapture(ctrl, "commit", "--allow-empty", "-m", release[1:])
 							return errors.Trace(err)
 						},
 					},
 					{
 						Message: "Tag repo",
-						Handler: func(w io.Writer) error {
-							_, err := run.GitCapture(w, "tag", "-a", release, "-m", release[1:])
+						Handler: func(ctrl *tasks.Controller) error {
+							_, err := run.GitCapture(ctrl, "tag", "-a", release, "-m", release[1:])
 							return errors.Trace(err)
 						},
 					},
 					{
 						Message: "Push tags",
-						Handler: func(w io.Writer) error {
-							_, err := run.GitCapture(w, "push", "--follow-tags")
+						Handler: func(ctrl *tasks.Controller) error {
+							_, err := run.GitCapture(ctrl, "push", "--follow-tags")
 							return errors.Trace(err)
 						},
 					},
@@ -164,7 +163,7 @@ func Release(update string) error {
 			},
 			&tasks.Task{
 				Message: "Create release draft on GitHub",
-				Handler: func(w io.Writer) error {
+				Handler: func(ctrl *tasks.Controller) error {
 					remote, err := git.RemoteURL("origin")
 					if err != nil {
 						return errors.Trace(err)
@@ -184,6 +183,7 @@ func Release(update string) error {
 					u.RawQuery = qs.Encode()
 					if err := run.OpenBrowser(u.String()); err != nil {
 						if errors.Is(err, run.ErrCannotOpenBrowser) {
+							ctrl.AddManualOutput("Open the following URL in your browser:", u.String())
 							return nil
 						}
 

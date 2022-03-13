@@ -5,47 +5,60 @@ import (
 	"sync"
 )
 
-type logsCapturer struct {
+type Controller struct {
 	mx            sync.RWMutex
 	lastLine      []byte
 	ellipsisAdded bool
 	startNewLine  bool
+	manualOutput  []string
 }
 
-func (ct *logsCapturer) Write(buf []byte) (int, error) {
-	ct.mx.Lock()
-	defer ct.mx.Unlock()
+func (ctrl *Controller) Write(buf []byte) (int, error) {
+	ctrl.mx.Lock()
+	defer ctrl.mx.Unlock()
 
 	for _, b := range buf {
 		// If a new character comes after a newline we start to fill up the newline.
-		if ct.startNewLine && b != '\n' && b != '\r' {
-			ct.startNewLine = false
-			ct.ellipsisAdded = false
-			ct.lastLine = nil
+		if ctrl.startNewLine && b != '\n' && b != '\r' {
+			ctrl.startNewLine = false
+			ctrl.ellipsisAdded = false
+			ctrl.lastLine = nil
 		}
 
 		// Fill characters until a limit
-		if len(ct.lastLine) < 60 {
-			ct.lastLine = append(ct.lastLine, b)
-		} else if !ct.ellipsisAdded {
-			ct.ellipsisAdded = true
-			ct.lastLine = append(ct.lastLine, '.', '.', '.')
+		if len(ctrl.lastLine) < 60 {
+			ctrl.lastLine = append(ctrl.lastLine, b)
+		} else if !ctrl.ellipsisAdded {
+			ctrl.ellipsisAdded = true
+			ctrl.lastLine = append(ctrl.lastLine, '.', '.', '.')
 		}
 
 		if b == '\n' {
-			ct.startNewLine = true
+			ctrl.startNewLine = true
 		}
 	}
 
 	return len(buf), nil
 }
 
-func (ct *logsCapturer) LastLine() string {
-	ct.mx.RLock()
-	defer ct.mx.RUnlock()
+func (ctrl *Controller) LastLine() string {
+	ctrl.mx.RLock()
+	defer ctrl.mx.RUnlock()
 
-	if ct.lastLine == nil {
+	if ctrl.lastLine == nil {
 		return ""
 	}
-	return strings.TrimSpace(string(ct.lastLine))
+	return strings.TrimSpace(string(ctrl.lastLine))
+}
+
+func (ctrl *Controller) AddManualOutput(lines ...string) {
+	ctrl.mx.Lock()
+	defer ctrl.mx.Unlock()
+	ctrl.manualOutput = append(ctrl.manualOutput, lines...)
+}
+
+func (ctrl *Controller) ManualOutput() []string {
+	ctrl.mx.RLock()
+	defer ctrl.mx.RUnlock()
+	return append([]string{}, ctrl.manualOutput...)
 }

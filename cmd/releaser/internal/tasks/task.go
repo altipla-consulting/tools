@@ -19,7 +19,7 @@ const (
 	taskStatusFailed
 )
 
-type TaskHandler func(w io.Writer) error
+type TaskHandler func(ctrl *Controller) error
 
 type Task struct {
 	Message string
@@ -28,11 +28,11 @@ type Task struct {
 
 	level int
 
-	mx       sync.RWMutex
-	status   taskStatus
-	anim     animation
-	err      error
-	capturer *logsCapturer
+	mx     sync.RWMutex
+	status taskStatus
+	anim   animation
+	err    error
+	ctrl   *Controller
 }
 
 func (task *Task) indentation() string {
@@ -47,10 +47,10 @@ func (task *Task) Run() error {
 	task.mx.Lock()
 	task.status = taskStatusRunning
 	task.anim.restart()
-	task.capturer = new(logsCapturer)
+	task.ctrl = new(Controller)
 	task.mx.Unlock()
 
-	err := task.Handler(task.capturer)
+	err := task.Handler(task.ctrl)
 
 	task.mx.Lock()
 	defer task.mx.Unlock()
@@ -85,12 +85,18 @@ func (task *Task) Render(w io.Writer) {
 
 	fmt.Fprintln(w, task.Message)
 
+	if task.status != taskStatusPending {
+		for _, line := range task.ctrl.ManualOutput() {
+			fmt.Fprintln(w, aurora.Gray(22, task.indentation()+"    "+line).Faint())
+		}
+	}
+
 	switch task.status {
 	case taskStatusFailed:
 		fmt.Fprintln(w, aurora.Gray(22, task.indentation()+"  → ").Faint(), aurora.Red(task.err.Error()))
 	case taskStatusRunning:
-		if task.capturer.LastLine() != "" {
-			fmt.Fprintln(w, aurora.Gray(22, task.indentation()+"  → "+task.capturer.LastLine()).Faint())
+		if task.ctrl.LastLine() != "" {
+			fmt.Fprintln(w, aurora.Gray(22, task.indentation()+"  → "+task.ctrl.LastLine()).Faint())
 		}
 	}
 }
