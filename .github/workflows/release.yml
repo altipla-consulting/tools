@@ -28,7 +28,7 @@ jobs:
       with:
         go-version: 1.17.3
     - name: Setup gcloud SDK
-      uses: google-github-actions/setup-gcloud@master
+      uses: google-github-actions/setup-gcloud@v0
       with:
         project_id: altipla-tools
     - name: Setup nfpm
