@@ -79,6 +79,63 @@
       }
     },
     {
+      "apiVersion": "batch/v1",
+      "kind": "CronJob",
+      "metadata": {
+        "name": "foo-cronjob"
+      },
+      "spec": {
+        "jobTemplate": {
+          "spec": {
+            "template": {
+              "spec": {
+                "containers": [],
+                "restartPolicy": "OnFailure"
+              }
+            }
+          }
+        },
+        "schedule": "* * * * *"
+      }
+    },
+    {
+      "apiVersion": "batch/v1",
+      "kind": "CronJob",
+      "metadata": {
+        "name": "foo-cronjob"
+      },
+      "spec": {
+        "jobTemplate": {
+          "spec": {
+            "template": {
+              "spec": {
+                "containers": [
+                  {
+                    "env": [
+                      {
+                        "name": "VERSION",
+                        "value": "foo-version"
+                      },
+                      {
+                        "name": "K_SERVICE",
+                        "value": "foo-container"
+                      }
+                    ],
+                    "image": "eu.gcr.io/foo:foo-version",
+                    "name": "foo-container",
+                    "ports": [],
+                    "volumeMounts": []
+                  }
+                ],
+                "restartPolicy": "OnFailure"
+              }
+            }
+          }
+        },
+        "schedule": "* * * * *"
+      }
+    },
+    {
       "apiVersion": "apps/v1",
       "kind": "Deployment",
       "metadata": {

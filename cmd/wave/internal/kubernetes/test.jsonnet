@@ -74,6 +74,14 @@ local wave = import 'wave.jsonnet';
         ) +
         wave.volumes.Google(name='foo-volume', disk='foo-disk'),
     },
+
+    cronjob: {
+      empty: wave.objects.CronJob(name='foo-cronjob', schedule='* * * * *'),
+      singleContainer: wave.objects.CronJob(name='foo-cronjob', schedule='* * * * *') +
+        wave.spec.CronJobContainer(
+          wave.objects.Container('foo-container', wave.env.Version('eu.gcr.io/foo')),
+        ),
+    },
   },
 
   features: {

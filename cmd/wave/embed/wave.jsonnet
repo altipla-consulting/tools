@@ -107,6 +107,25 @@
         externalTrafficPolicy: 'Local',
       },
     },
+
+    CronJob: function(name, schedule) {
+      apiVersion: 'batch/v1',
+      kind: 'CronJob',
+      metadata: {name: name},
+      spec: {
+        schedule: schedule,
+        jobTemplate: {
+          spec: {
+            template: {
+              spec: {
+                containers: [],
+                restartPolicy: 'OnFailure',
+              },
+            },
+          },
+        },
+      },
+    },
   },
 
   network: {
@@ -299,6 +318,20 @@
           template+: {
             spec+: {
               containers+: [container],
+            },
+          },
+        },
+      },
+    },
+
+    CronJobContainer: function(container) {
+      spec+: {
+        jobTemplate+: {
+          spec+: {
+            template+: {
+              spec+: {
+                containers+: [container],
+              },
             },
           },
         },
