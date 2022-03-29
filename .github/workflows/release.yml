@@ -31,6 +31,7 @@ jobs:
       uses: google-github-actions/setup-gcloud@v0
       with:
         project_id: altipla-tools
+        install_components: alpha,beta
     - name: Setup nfpm
       run: |-
         echo 'deb [trusted=yes] https://repo.goreleaser.com/apt/ /' | sudo tee /etc/apt/sources.list.d/goreleaser.list
@@ -123,7 +124,6 @@ jobs:
 
     - name: Release install scripts
       run: |-
-        gcloud --quiet components install alpha
         gcloud alpha storage cp -R --cache-control 'public, max-age=10' install gs://tools.altipla.consulting
 
     - name: Build DEB packages
@@ -146,7 +146,6 @@ jobs:
   
     - name: Release DEB packages
       run: |-
-        gcloud --quiet components install beta
         gcloud beta artifacts apt upload acpublic --source=tools_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud beta artifacts apt upload acpublic --source=ci_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud beta artifacts apt upload acpublic --source=gaestage_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
