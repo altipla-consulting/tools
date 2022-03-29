@@ -146,16 +146,16 @@ jobs:
   
     - name: Release DEB packages
       run: |-
-        gcloud alpha artifacts apt upload acpublic --source=ci_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
-        gcloud alpha artifacts apt upload acpublic --source=gaestage_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
-        gcloud alpha artifacts apt upload acpublic --source=gendc_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
-        gcloud alpha artifacts apt upload acpublic --source=impsort_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
-        gcloud alpha artifacts apt upload acpublic --source=jnet_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
-        gcloud alpha artifacts apt upload acpublic --source=linter_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
-        gcloud alpha artifacts apt upload acpublic --source=previewer-netlify_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
-        gcloud alpha artifacts apt upload acpublic --source=pub_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
-        gcloud alpha artifacts apt upload acpublic --source=reloader_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
-        gcloud alpha artifacts apt upload acpublic --source=wave_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
-        gcloud alpha artifacts apt upload acpublic --source=releaser_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
-        gcloud alpha artifacts apt upload acpublic --source=configure-dev-machine_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
-        gcloud alpha artifacts apt upload acpublic --source=tools_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --async --source=ci_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --async --source=gaestage_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --async --source=gendc_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --async --source=impsort_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --async --source=jnet_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --async --source=linter_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --async --source=previewer-netlify_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --async --source=pub_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --async --source=reloader_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --async --source=wave_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --async --source=releaser_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --async --source=configure-dev-machine_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud beta artifacts apt upload acpublic --async --source=tools_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
