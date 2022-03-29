@@ -146,7 +146,6 @@ jobs:
   
     - name: Release DEB packages
       run: |-
-        gcloud alpha artifacts apt upload acpublic --source=tools_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud alpha artifacts apt upload acpublic --source=ci_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud alpha artifacts apt upload acpublic --source=gaestage_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud alpha artifacts apt upload acpublic --source=gendc_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
@@ -159,3 +158,4 @@ jobs:
         gcloud alpha artifacts apt upload acpublic --source=wave_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud alpha artifacts apt upload acpublic --source=releaser_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud alpha artifacts apt upload acpublic --source=configure-dev-machine_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
+        gcloud alpha artifacts apt upload acpublic --source=tools_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
