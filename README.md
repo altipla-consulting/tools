@@ -26,7 +26,6 @@ There are multiple tools inside this repo with different levels of activity and 
 | Tool | State | Support | Docs |
 |------|-------|---------|------|
 | `ci` | ![](https://img.shields.io/badge/state-active-brightgreen) | ![](https://img.shields.io/badge/usage-external-blue) | [Docs](./cmd/ci/README.md) |
-| `configure-dev-machine` | ![](https://img.shields.io/badge/state-active-brightgreen) | | [Docs](./cmd/configure-dev-machine/README.md) |
 | `gaestage` | ![](https://img.shields.io/badge/state-active-brightgreen) | ![](https://img.shields.io/badge/usage-external-blue) | [Docs](./cmd/gaestage/README.md) |
 | `gendc` | ![](https://img.shields.io/badge/state-active-brightgreen) | | [Docs](./cmd/gendc/README.md) |
 | `impsort` | ![](https://img.shields.io/badge/state-active-brightgreen) | ![](https://img.shields.io/badge/usage-external-blue) | [Docs](./cmd/impsort/README.md) |

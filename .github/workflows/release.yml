@@ -115,12 +115,6 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/releaser
         name: releaser
-    - name: Release configure-dev-machine
-      uses: altipla-consulting/go-release.actions@main
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        source: ./cmd/configure-dev-machine
-        name: configure-dev-machine
 
     - name: Release install scripts
       run: |-
@@ -142,7 +136,6 @@ jobs:
         nfpm pkg --packager deb -f deb/reloader.yml
         nfpm pkg --packager deb -f deb/wave.yml
         nfpm pkg --packager deb -f deb/releaser.yml
-        nfpm pkg --packager deb -f deb/configure-dev-machine.yml
   
     - name: Release DEB packages
       run: |-
@@ -157,5 +150,4 @@ jobs:
         gcloud beta artifacts apt upload acpublic --async --source=reloader_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud beta artifacts apt upload acpublic --async --source=wave_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud beta artifacts apt upload acpublic --async --source=releaser_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
-        gcloud beta artifacts apt upload acpublic --async --source=configure-dev-machine_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud beta artifacts apt upload acpublic --async --source=tools_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
