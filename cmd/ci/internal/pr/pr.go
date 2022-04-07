@@ -3,7 +3,7 @@ package pr
 import (
 	"context"
 
-	"github.com/google/go-github/v32/github"
+	"github.com/google/go-github/v43/github"
 	"golang.org/x/oauth2"
 	"libs.altipla.consulting/errors"
 

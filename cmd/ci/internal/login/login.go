@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/google/go-github/v32/github"
+	"github.com/google/go-github/v43/github"
 	"github.com/segmentio/ksuid"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
