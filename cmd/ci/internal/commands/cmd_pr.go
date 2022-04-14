@@ -93,7 +93,7 @@ var cmdPR = &cobra.Command{
 		log.Info("\t" + link)
 		log.Info()
 
-		if err := run.OpenBrowser(link); err != nil {
+		if err := run.OpenBrowser(link); err != nil && !errors.Is(err, run.ErrCannotOpenBrowser) {
 			return errors.Trace(err)
 		}
 
