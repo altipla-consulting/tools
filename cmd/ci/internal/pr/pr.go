@@ -69,8 +69,11 @@ func Create(ctx context.Context, title string) (string, error) {
 	if err != nil {
 		return "", errors.Trace(err)
 	}
-
 	branch, err := query.CurrentBranch()
+	if err != nil {
+		return "", errors.Trace(err)
+	}
+	base, err := query.MainBranch()
 	if err != nil {
 		return "", errors.Trace(err)
 	}
@@ -78,7 +81,7 @@ func Create(ctx context.Context, title string) (string, error) {
 	req := &github.NewPullRequest{
 		Title: github.String(title),
 		Head:  github.String(branch),
-		Base:  github.String("master"),
+		Base:  github.String(base),
 		Body:  github.String(""),
 	}
 	pr, _, err := client.PullRequests.Create(ctx, org, repo, req)
