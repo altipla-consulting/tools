@@ -227,6 +227,9 @@ func (r *runner) Stop() error {
 		if err := r.cmd.Process.Signal(os.Interrupt); err != nil {
 			return errors.Trace(err)
 		}
+		if err := r.cmd.Wait(); err != nil {
+			return errors.Trace(err)
+		}
 	}
 	return nil
 }
