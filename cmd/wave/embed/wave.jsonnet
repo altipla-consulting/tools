@@ -164,6 +164,15 @@
 
   env: {
     Version: function(name) name + ':' + std.extVar('version'),
+
+    Variable: function(name, value) {
+      env+: [
+        {
+          name: name,
+          value: value,
+        },
+      ],
+    },
   },
 
   identities: {

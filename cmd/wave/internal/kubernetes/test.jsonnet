@@ -59,6 +59,12 @@ local wave = import 'wave.jsonnet';
           wave.identities.GoogleBind()
         ) +
         wave.identities.Google(name='foo-deployment'),
+      customEnv: wave.objects.Deployment(name='foo-deployment') +
+        wave.spec.DeploymentContainer(
+          wave.objects.Container('foo-container', wave.env.Version('eu.gcr.io/foo')) +
+          wave.env.Variable('FOO', 'bar') +
+          wave.env.Variable('BAZ', 'qux'),
+        ),
     },
 
     statefulset: {
