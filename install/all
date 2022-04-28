@@ -16,7 +16,6 @@ TOOLS=(
   gaestage
   impsort
   jnet
-  linter
   previewer-netlify
   pub
   releaser

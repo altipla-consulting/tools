@@ -29,7 +29,6 @@ There are multiple tools inside this repo with different levels of activity and 
 | `gaestage` | ![](https://img.shields.io/badge/state-active-brightgreen) | ![](https://img.shields.io/badge/usage-external-blue) | [Docs](./cmd/gaestage/README.md) |
 | `impsort` | ![](https://img.shields.io/badge/state-active-brightgreen) | ![](https://img.shields.io/badge/usage-external-blue) | [Docs](./cmd/impsort/README.md) |
 | `jnet` | ![](https://img.shields.io/badge/state-active-brightgreen) | ![](https://img.shields.io/badge/usage-external-blue) | [Docs](./cmd/jnet/README.md) |
-| `linter` | ![](https://img.shields.io/badge/state-active-brightgreen) | | |
 | `previewer-netlify` | ![](https://img.shields.io/badge/state-deprecated-red) | | [Docs](./cmd/previewer/README.md) |
 | `pub` | ![](https://img.shields.io/badge/state-deprecated-red) | | [Docs](./cmd/pub/README.md) |
 | `releaser` | ![](https://img.shields.io/badge/state-active-brightgreen) | ![](https://img.shields.io/badge/usage-external-blue) | [Docs](./cmd/releaser/README.md) |

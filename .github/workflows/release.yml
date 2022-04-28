@@ -73,12 +73,6 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         source: ./cmd/jnet
         name: jnet
-    - name: Release linter
-      uses: altipla-consulting/go-release.actions@main
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        source: ./cmd/linter
-        name: linter
     - name: Release previewer-netlify
       uses: altipla-consulting/go-release.actions@main
       with:
@@ -111,7 +105,6 @@ jobs:
         nfpm pkg --packager deb -f deb/gaestage.yml
         nfpm pkg --packager deb -f deb/impsort.yml
         nfpm pkg --packager deb -f deb/jnet.yml
-        nfpm pkg --packager deb -f deb/linter.yml
         nfpm pkg --packager deb -f deb/previewer-netlify.yml
         nfpm pkg --packager deb -f deb/pub.yml
         nfpm pkg --packager deb -f deb/releaser.yml
@@ -122,7 +115,6 @@ jobs:
         gcloud beta artifacts apt upload acpublic --async --source=gaestage_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud beta artifacts apt upload acpublic --async --source=impsort_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud beta artifacts apt upload acpublic --async --source=jnet_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
-        gcloud beta artifacts apt upload acpublic --async --source=linter_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud beta artifacts apt upload acpublic --async --source=previewer-netlify_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud beta artifacts apt upload acpublic --async --source=pub_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
         gcloud beta artifacts apt upload acpublic --async --source=releaser_${{ steps.version_numonly.outputs.VERSION }}_amd64.deb --location europe-west1 --project altipla-tools
