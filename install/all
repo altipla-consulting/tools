@@ -14,15 +14,12 @@ LATEST_VERSION=$(curl -sL https://api.github.com/repos/altipla-consulting/tools/
 TOOLS=(
   ci
   gaestage
-  gendc
   impsort
   jnet
   linter
   previewer-netlify
   pub
   releaser
-  reloader
-  wave
 )
 for app in "${TOOLS[@]}"
 do
