@@ -12,7 +12,6 @@ fi
 LATEST_VERSION=$(curl -sL https://api.github.com/repos/altipla-consulting/tools/releases/latest | jq -r '.tag_name')
 
 TOOLS=(
-  ci
   gaestage
   impsort
   jnet

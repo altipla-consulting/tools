@@ -1,4 +1,0 @@
-
-# ci
-
-Git related helper.

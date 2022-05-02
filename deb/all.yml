@@ -10,7 +10,6 @@ platform: linux
 section: default
 priority: extra
 depends:
-- ci (= REPLACE_VERSION_NUMONLY)
 - gaestage (= REPLACE_VERSION_NUMONLY)
 - impsort (= REPLACE_VERSION_NUMONLY)
 - jnet (= REPLACE_VERSION_NUMONLY)
