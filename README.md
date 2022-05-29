@@ -30,7 +30,6 @@ There are multiple tools inside this repo with different levels of activity and 
 | `jnet` | ![](https://img.shields.io/badge/state-active-brightgreen) | ![](https://img.shields.io/badge/usage-external-blue) | [Docs](./cmd/jnet/README.md) |
 | `previewer-netlify` | ![](https://img.shields.io/badge/state-deprecated-red) | | [Docs](./cmd/previewer/README.md) |
 | `pub` | ![](https://img.shields.io/badge/state-deprecated-red) | | [Docs](./cmd/pub/README.md) |
-| `releaser` | ![](https://img.shields.io/badge/state-active-brightgreen) | ![](https://img.shields.io/badge/usage-external-blue) | [Docs](./cmd/releaser/README.md) |
 | `runner` | ![](https://img.shields.io/badge/state-deprecated-red) | | [Docs](./cmd/runner/README.md) |
 
 ### Legend
